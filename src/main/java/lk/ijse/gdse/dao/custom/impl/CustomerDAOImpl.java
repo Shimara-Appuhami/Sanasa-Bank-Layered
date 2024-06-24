@@ -55,13 +55,15 @@ public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
     public String generateNewID() throws SQLException, ClassNotFoundException {
-        ResultSet rst= SQLUtil.execute("SELECT c_id FROM customer ORDER BY c_id DESC LIMIT 1");
-        if(rst.next()){
-            return String.valueOf(new CustomerDTO(rst.getString("c_id")));
+        ResultSet rst = SQLUtil.execute("SELECT c_id FROM customer ORDER BY c_id DESC LIMIT 1;");
+        if (rst.next()) {
+            String id = rst.getString("c_id");
+            int newCustomerId = Integer.parseInt(id.replace("C", "")) + 1;
+            return String.format("C%03d", newCustomerId);
+        } else {
+            return "C001";
         }
-        return null;
-
-}
+    }
 
     @Override
     public CustomerDTO searchByNic(String nic) throws SQLException, ClassNotFoundException {

@@ -34,7 +34,7 @@ import java.util.List;
 public class CustomerFormController {
 
     public JFXButton btnBack;
-    public JFXComboBox cmbInquiryId;
+
     public TextField txtNic;
     public TableColumn colNic;
     public DatePicker txtBirth;
@@ -115,7 +115,7 @@ public class CustomerFormController {
         txtNic.clear();
         txtRegistration.setValue(null);
         txtIncome.clear();
-        txtId.setText(generateNewId());
+        txtId.clear();
         txtId.clear();
     }
 
@@ -144,6 +144,8 @@ public class CustomerFormController {
 
     @FXML
     void btnSaveOnAction(ActionEvent event) throws ClassNotFoundException {
+
+
         String id = txtId.getText();
         String name = txtName.getText();
         String email = txtEmail.getText();
@@ -243,7 +245,7 @@ public class CustomerFormController {
     }
 
     public void initialize() throws SQLException, ClassNotFoundException {
-        getLastCustomerId();
+        txtId.setText(generateNewId());
         setDate();
         //getCustomerIds();
         setCellValueFactory();
@@ -322,11 +324,8 @@ public class CustomerFormController {
 
     private String getLastCustomerId(){//limit quiry eken last eka gannawa
         List<CustomerTm> tempCustomersList = new ArrayList<>(tblCustomer.getItems());
-        if (tempCustomersList.isEmpty()) {
-            return null; // Handle empty list case
-        }
-        Collections.sort(tempCustomersList); // Ensure list is sorted based on Customer ID
-        return tempCustomersList.get(tempCustomersList.size() - 1).getC_id(); // Get the last customer ID
+        Collections.sort(tempCustomersList);
+        return tempCustomersList.get(tempCustomersList.size() - 1).getC_id();
     }
 
     private String generateNewId() {
@@ -348,9 +347,6 @@ public class CustomerFormController {
             return String.format("C%03d", newCustomerId);
         }
 
-    }
-    private void showAlert(Alert.AlertType alertType, String message) {
-        new Alert(alertType, message).show();
     }
     private void setDate() {
         LocalDate now = LocalDate.now();
