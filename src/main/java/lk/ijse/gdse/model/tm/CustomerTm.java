@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class CustomerTm {
+public class CustomerTm implements Comparable<CustomerTm> {
     private String c_id;
     private String c_name;
     private String c_email;
@@ -19,4 +19,8 @@ public class CustomerTm {
     private String nic;
     private String registration_date;
     private String annual_income;
+
+    @Override
+    public int compareTo(CustomerTm o) {
+        return c_id.compareTo(o.getC_id());    }
 }

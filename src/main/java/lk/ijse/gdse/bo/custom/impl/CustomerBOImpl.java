@@ -19,14 +19,15 @@ public class CustomerBOImpl implements CustomerBo {
     public  boolean updateCustomer(CustomerDTO dto) throws SQLException, ClassNotFoundException{
         return customerDAO.update(new Customer(dto.getCId(), dto.getCName(), dto.getCEmail(), dto.getCContact(), dto.getCAddress(), dto.getCAge(), dto.getDateOfBirth(), dto.getNic(), dto.getRegistrationDate(), dto.getAnnualIncome()));
     }
+
     public  boolean deleteCustomer(String id) throws SQLException, ClassNotFoundException{
         return customerDAO.delete(id);
-
     }
+
     public CustomerDTO searchById(String id) throws SQLException, ClassNotFoundException{
         return customerDAO.searchById(id);
-
     }
+
     public List<CustomerDTO> getAllCustomers() throws SQLException, ClassNotFoundException{
         List<Customer> customers=customerDAO.getAll();
         ArrayList<CustomerDTO> customerDTOS=new ArrayList<>();
@@ -36,14 +37,13 @@ public class CustomerBOImpl implements CustomerBo {
         }
         return customerDTOS;
     }
-    public  String getLastIdCustomer() throws SQLException, ClassNotFoundException{
-        return customerDAO.getLastId();
+
+    public  String generateNewCustomerID() throws SQLException, ClassNotFoundException{
+        return customerDAO.generateNewID();
     }
 
-    @Override
     public CustomerDTO searchByNicCustomer(String nic) throws SQLException, ClassNotFoundException {
-        return customerDAO.searchByNic("SELECT * FROM customer WHERE nic = ?");
+        return customerDAO.searchByNic(nic);
     }
-
 
 }

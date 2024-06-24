@@ -13,7 +13,7 @@ public interface CustomerBo extends SuperBO {
         public  boolean deleteCustomer(String id) throws SQLException, ClassNotFoundException;
          public CustomerDTO searchById(String id) throws SQLException, ClassNotFoundException;
         public List<CustomerDTO> getAllCustomers() throws SQLException, ClassNotFoundException;
-        public  String getLastIdCustomer() throws SQLException, ClassNotFoundException;
+        public  String generateNewCustomerID() throws SQLException, ClassNotFoundException;
         public CustomerDTO searchByNicCustomer(String nic) throws SQLException, ClassNotFoundException;
 
 

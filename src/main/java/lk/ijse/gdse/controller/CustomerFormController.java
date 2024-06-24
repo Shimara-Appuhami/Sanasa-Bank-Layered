@@ -27,6 +27,8 @@ import net.sf.jasperreports.view.JasperViewer;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CustomerFormController {
@@ -113,6 +115,8 @@ public class CustomerFormController {
         txtNic.clear();
         txtRegistration.setValue(null);
         txtIncome.clear();
+        txtId.setText(generateNewId());
+        txtId.clear();
     }
 
 
@@ -206,13 +210,13 @@ public class CustomerFormController {
     }
     @FXML
     void txtSearchOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
-        String id = txtId.getText();
+       // String id = txtId.getText();
         String nic=txtNic.getText();
 
         try {
 
-            CustomerDTO customerDTO = customerBo.searchById(id);
-             customerDTO =customerBo.searchByNicCustomer(nic);
+           // CustomerDTO customerDTO = customerBo.searchById(id);
+             CustomerDTO customerDTO =customerBo.searchByNicCustomer(nic);
             setCustomerData(customerDTO);
 
         } catch (SQLException e) {
@@ -239,7 +243,7 @@ public class CustomerFormController {
     }
 
     public void initialize() throws SQLException, ClassNotFoundException {
-        lastCustomerId();
+        getLastCustomerId();
         setDate();
         //getCustomerIds();
         setCellValueFactory();
@@ -316,34 +320,35 @@ public class CustomerFormController {
 
     }
 
-    public void lastCustomerId() throws ClassNotFoundException {
+    private String getLastCustomerId(){//limit quiry eken last eka gannawa
+        List<CustomerTm> tempCustomersList = new ArrayList<>(tblCustomer.getItems());
+        if (tempCustomersList.isEmpty()) {
+            return null; // Handle empty list case
+        }
+        Collections.sort(tempCustomersList); // Ensure list is sorted based on Customer ID
+        return tempCustomersList.get(tempCustomersList.size() - 1).getC_id(); // Get the last customer ID
+    }
+
+    private String generateNewId() {
         try {
-            String lastId = customerBo.getLastIdCustomer();
-            String nextId = generateNextId(lastId);
-            txtId.setText(nextId); // Set the generated ID to the text field
+            //Generate New ID
+            return customerBo.generateNewCustomerID();
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error retrieving last customer ID: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            showAlert(Alert.AlertType.ERROR, e.getMessage()); // Handle invalid ID format
+            new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-    }
 
 
-    public String generateNextId(String lastId) {
-        if (lastId != null && lastId.matches("C\\d+")) { // Check if lastId starts with "C" followed by digits
-            try {
-                int lastNumericId = Integer.parseInt(lastId.substring(1)); // Extract numeric part
-                int nextNumericId = lastNumericId + 1; // Increment numeric part
-                return String.format("C%03d", nextNumericId); // Format as "CXXX"
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Error generating next ID: Invalid ID format", e); // Re-throw as runtime exception
-            }
+        if (tblCustomer.getItems().isEmpty()) {
+            return "C001";
         } else {
-            return "C001"; // Default ID if lastId is null or doesn't match the expected format
+            String id = getLastCustomerId();
+            int newCustomerId = Integer.parseInt(id.replace("C", "")) + 1;
+            return String.format("C%03d", newCustomerId);
         }
+
     }
-
-
     private void showAlert(Alert.AlertType alertType, String message) {
         new Alert(alertType, message).show();
     }
@@ -400,11 +405,4 @@ public class CustomerFormController {
       JasperViewer.viewReport(jasperPrint,false);
 
   }
-}/*echo "# Sanasa-Bank-Layered" >> README.md
-    git init
-    git add README.md
-        git commit -m "first commit"
-        git branch -M main
-        git remote add origin https://github.com/Shimara-Appuhami/Sanasa-Bank-Layered.git
-        git push -u origin main
-        */
+}

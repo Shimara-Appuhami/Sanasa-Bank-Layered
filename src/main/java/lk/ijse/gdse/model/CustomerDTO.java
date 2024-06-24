@@ -1,12 +1,13 @@
 package lk.ijse.gdse.model;
 import lombok.*;
 
+import java.io.Serializable;
 
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerDTO {
+public class CustomerDTO implements Serializable {
     private String cId;
     private String cName;
     private String cEmail;

@@ -12,18 +12,22 @@ import java.util.List;
 
 public class CustomerDAOImpl implements CustomerDAO {
     @Override
-    public boolean save(Customer customerDTO) throws SQLException, ClassNotFoundException {
-        return SQLUtil.execute("INSERT INTO customer VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?)");
+    public boolean save(Customer customer) throws SQLException, ClassNotFoundException {
+        return SQLUtil.execute("INSERT INTO customer VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?)",  customer.getCId(), customer.getCName(), customer.getCEmail(), customer.getCContact(),
+                customer.getCAddress(), customer.getCAge(), customer.getDateOfBirth(), customer.getNic(),
+                customer.getRegistrationDate(), customer.getAnnualIncome());
     }
 
     @Override
-    public boolean update(Customer customerDTO) throws SQLException, ClassNotFoundException {
-        return SQLUtil.execute( "UPDATE customer SET c_name=?, c_email=?, c_contact=?, c_address=?, c_age=?, date_of_birth=?,nic=?, registration_date=?, annual_income=? WHERE c_id=?");
+    public boolean update(Customer customer) throws SQLException, ClassNotFoundException {
+        return SQLUtil.execute( "UPDATE customer SET c_name=?, c_email=?, c_contact=?, c_address=?, c_age=?, date_of_birth=?,nic=?, registration_date=?, annual_income=? WHERE c_id=?",   customer.getCName(), customer.getCEmail(), customer.getCContact(),
+                customer.getCAddress(), customer.getCAge(), customer.getDateOfBirth(), customer.getNic(),
+                customer.getRegistrationDate(), customer.getAnnualIncome(),customer.getCId());
     }
 
     @Override
     public boolean delete(String cId) throws SQLException, ClassNotFoundException {
-        return SQLUtil.execute("DELETE FROM customer WHERE c_id = ?");
+        return SQLUtil.execute("DELETE FROM customer WHERE c_id = ?",cId);
     }
 
     @Override
@@ -50,7 +54,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 
 
     @Override
-    public String getLastId() throws SQLException, ClassNotFoundException {
+    public String generateNewID() throws SQLException, ClassNotFoundException {
         ResultSet rst= SQLUtil.execute("SELECT c_id FROM customer ORDER BY c_id DESC LIMIT 1");
         if(rst.next()){
             return String.valueOf(new CustomerDTO(rst.getString("c_id")));
@@ -61,10 +65,22 @@ public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
     public CustomerDTO searchByNic(String nic) throws SQLException, ClassNotFoundException {
-        ResultSet rst= SQLUtil.execute("SELECT * FROM customer WHERE nic = ?");
-         if(rst.next()){
-            return new CustomerDTO(rst.getString("c_id"), rst.getString("c_name"), rst.getString("c_email"), rst.getString("c_contact"), rst.getString("c_address"), rst.getString("c_age"), rst.getString("date_of_birth"), rst.getString("nic"), rst.getString("registration_date"), rst.getString("annual_income"));
+        ResultSet rst = SQLUtil.execute("SELECT * FROM customer WHERE nic = ?",nic);
+        if (rst.next()) {
+            return new CustomerDTO(
+                    rst.getString("c_id"),
+                    rst.getString("c_name"),
+                    rst.getString("c_email"),
+                    rst.getString("c_contact"),
+                    rst.getString("c_address"),
+                    rst.getString("c_age"),
+                    rst.getString("date_of_birth"),
+                    rst.getString("nic"),
+                    rst.getString("registration_date"),
+                    rst.getString("annual_income")
+            );
         }
-         return null;
+        return null;
     }
+
 }

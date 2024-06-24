@@ -11,7 +11,7 @@ public interface CrudDAO<T>extends SuperDAO {
     public  boolean delete(String id) throws SQLException, ClassNotFoundException;
     public CustomerDTO searchById(String id) throws SQLException, ClassNotFoundException;
     public  List<T> getAll() throws SQLException, ClassNotFoundException;
-    public  String getLastId() throws SQLException, ClassNotFoundException;
+    public  String generateNewID() throws SQLException, ClassNotFoundException;
     public CustomerDTO searchByNic(String nic) throws SQLException, ClassNotFoundException;
 
     }
