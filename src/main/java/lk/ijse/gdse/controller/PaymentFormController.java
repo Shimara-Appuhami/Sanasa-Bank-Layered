@@ -121,7 +121,7 @@ public class PaymentFormController {
 
     private void clearFields() {
         //txtInvoiceNo.clear();
-      //  txtNic.clear();
+        txtNic.clear();
         cmbLoanId.clear();
         cmbRateId.clear();
         cmbPaymentMethod.setValue(null);
@@ -207,7 +207,7 @@ public class PaymentFormController {
                 if (isSaved) {
                     new Alert(Alert.AlertType.CONFIRMATION, "Payment saved successfully").show();
                     initialize();
-                    clearFields();
+                   // clearFields();
                 }
             } else {
                 new Alert(Alert.AlertType.ERROR, "Failed to save payment").show();
@@ -238,7 +238,7 @@ public class PaymentFormController {
                 if (isUpdated) {
                     new Alert(Alert.AlertType.CONFIRMATION, "Payment updated successfully").show();
                     initialize();
-                    clearFields();
+                    //clearFields();
                 }
             } else {
                 new Alert(Alert.AlertType.ERROR, "Failed to update payment").show();
@@ -299,7 +299,7 @@ public class PaymentFormController {
         PaymentDTO payment = paymentBo.searchByNic(nic);
         if (payment != null) {
            // txtInvoiceNo.setText(payment.getPInvoiceNo());
-            txtNic.setText(payment.getNic());
+           // txtNic.setText(payment.getNic());
             cmbLoanId.setText(payment.getLoanId());
             cmbRateId.setText(payment.getRateId());
             cmbPaymentMethod.setValue(payment.getPaymentMethod());
