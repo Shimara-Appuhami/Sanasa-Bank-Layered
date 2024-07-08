@@ -24,8 +24,15 @@ import java.io.Serializable;
 
 
         public Customer(String name, String email, String contact, String address, String age, String birth, String registrationDate, String income, String inId) {
-
-
+            this.cName = name;
+            this.cEmail = email;
+            this.cContact = contact;
+            this.cAddress = address;
+            this.cAge = age;
+            this.dateOfBirth = birth;
+            this.nic = inId;
+            this.registrationDate = registrationDate;
+            this.annualIncome = income;
         }
 
 

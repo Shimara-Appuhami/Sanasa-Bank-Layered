@@ -17,6 +17,7 @@ import lk.ijse.gdse.Util.Regex;
 import lk.ijse.gdse.bo.BOFactory;
 import lk.ijse.gdse.bo.custom.InquiryBo;
 import lk.ijse.gdse.db.DbConnection;
+import lk.ijse.gdse.entity.Inquiry;
 import lk.ijse.gdse.model.InquiryDTO;
 import lk.ijse.gdse.model.tm.CustomerTm;
 import lk.ijse.gdse.model.tm.InquiryTm;
@@ -173,7 +174,7 @@ public class InquiryFormController {
         String id = txtNic.getText();
 
         try {
-            InquiryDTO inquiryDTO = inquiryBo.searchByIdInquiry(id);
+            Inquiry inquiryDTO = inquiryBo.searchByNicInquiry(id);
             if (inquiryDTO != null ) {
                 txtInquiryId.setText(inquiryDTO.getInId());
                 txtCustomerId.setText(inquiryDTO.getCId());
@@ -182,15 +183,10 @@ public class InquiryFormController {
                 txtResponseDate.setValue(LocalDate.parse(inquiryDTO.getResponseDate()));
 
             } else {
-                String customerId = String.valueOf(inquiryBo.searchByNicInquiry(id));
-                if (inquiryDTO != null) {
+                String customerId =inquiryBo.getCustomerId(id);
                     txtCustomerId.setText(customerId);
-                   // new Alert(Alert.AlertType.INFORMATION, "Your Customer ID is ");
-                } else {
                     new Alert(Alert.AlertType.INFORMATION, "Your Customer ID is found").show();
-                    //new Alert(Alert.AlertType.ERROR, "Customer not found for NIC: " + id).show();
-                }
-                initialize();
+
 
             }
         } catch (SQLException e) {
@@ -337,7 +333,7 @@ public class InquiryFormController {
     public boolean isValied(){
         if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.ID,txtCustomerId)) return false;
         if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.NIC,txtNic)) return false;
-        if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.INQUIRYID,txtId)) return false;
+        //if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.INQUIRYID,txtId)) return false;
 
 
 

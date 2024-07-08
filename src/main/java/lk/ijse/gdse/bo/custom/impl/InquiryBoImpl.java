@@ -53,11 +53,13 @@ public class InquiryBoImpl implements InquiryBo {
     }
 
     @Override
-    public InquiryDTO searchByNicInquiry(String nic) throws SQLException, ClassNotFoundException {
-        Inquiry dto = inquiryDAO.searchById(nic);
-        if (dto != null) {
-            return new InquiryDTO(dto.getInId(),dto.getNic(),dto.getCId(),dto.getInType(),dto.getInDate(),dto.getResponseDate());
-        }
-        return null;
+    public Inquiry searchByNicInquiry(String nic) throws SQLException, ClassNotFoundException {
+
+        return inquiryDAO.searchByNic(nic);
+    }
+
+    @Override
+    public String getCustomerId(String nic) throws SQLException, ClassNotFoundException {
+        return inquiryDAO.getCustomerId(nic);
     }
 }

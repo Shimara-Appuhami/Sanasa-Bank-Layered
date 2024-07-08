@@ -16,6 +16,7 @@ public interface InquiryBo extends SuperBO {
     InquiryDTO searchByIdInquiry(String id) throws SQLException, ClassNotFoundException;
     List<InquiryDTO> getAllInquiries() throws SQLException, ClassNotFoundException;
     String generateNewInquiryID() throws SQLException, ClassNotFoundException;
-    public InquiryDTO searchByNicInquiry(String nic) throws SQLException, ClassNotFoundException;
+    public Inquiry searchByNicInquiry(String nic) throws SQLException, ClassNotFoundException;
+    String getCustomerId(String nic) throws SQLException, ClassNotFoundException;
 
 }

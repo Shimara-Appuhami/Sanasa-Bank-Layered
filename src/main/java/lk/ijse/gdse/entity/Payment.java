@@ -23,4 +23,12 @@ public class Payment implements Serializable {
 
     public Payment(String loanType, String rateId) {
     }
+
+    public Payment(String loanId, String loanType, String rateId) {
+
+        this.loanId = loanId;
+        this.loanType = loanType;
+        this.rateId = rateId;
+
+    }
 }

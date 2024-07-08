@@ -59,19 +59,26 @@ public class InquiryDAOImpl implements InquiryDAO {
 
     @Override
     public Inquiry searchByNic(String nic) throws SQLException, ClassNotFoundException {
-        ResultSet rst = SQLUtil.execute("SELECT c_id FROM customer WHERE nic = ?",nic);
+        ResultSet rst = SQLUtil.execute("SELECT * FROM inquiries WHERE nic = ?",nic);
         if (rst.next()) {
             return new Inquiry(
-                    rst.getString("inId"),
+                    rst.getString("in_id"),
                     rst.getString("nic"),
-                    rst.getString("cId"),
-                    rst.getString("inType"),
-                    rst.getString("inDate"),
-                    rst.getString("responseDate")
+                    rst.getString("c_id"),
+                    rst.getString("in_type"),
+                    rst.getString("in_date"),
+                    rst.getString("response_date")
 
             );
         }
         return null;
     }
-
+    @Override
+    public String getCustomerId(String nic) throws SQLException, ClassNotFoundException {
+        ResultSet rst = SQLUtil.execute("SELECT c_id FROM customer WHERE nic=?", nic);
+        if (rst.next()) {
+            return rst.getString("c_id");
+        }
+        return null;
+    }
 }

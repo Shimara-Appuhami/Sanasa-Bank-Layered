@@ -93,4 +93,9 @@ public class PaymentBoImpl implements PaymentBo {
     public String getLoanType(String nic) throws SQLException, ClassNotFoundException {
             return paymentDAO.getLoanType(nic);
     }
+
+    @Override
+    public String getRateId(String loanType) throws SQLException, ClassNotFoundException {
+        return paymentDAO.getRateId(loanType);
+    }
 }

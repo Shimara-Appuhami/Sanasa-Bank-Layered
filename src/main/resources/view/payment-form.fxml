@@ -116,7 +116,7 @@
             <Font name="Cambria" size="14.0" />
          </font>
       </Label>
-      <JFXComboBox fx:id="cmbLoanType" layoutX="304.0" layoutY="273.0" onAction="#cmbLoanTypeOnAction" prefHeight="26.0" prefWidth="150.0" />
+      <TextField fx:id="cmbLoanType" layoutX="304.0" layoutY="273.0" onAction="#cmbLoanTypeOnAction" prefHeight="26.0" prefWidth="150.0" />
       <DatePicker fx:id="txtDate" layoutX="304.0" layoutY="231.0" onAction="#txtDateOnAction" prefHeight="26.0" prefWidth="150.0" />
       <Label layoutX="184.0" layoutY="486.0" prefHeight="30.0" prefWidth="86.0" text="Loan ID">
          <font>

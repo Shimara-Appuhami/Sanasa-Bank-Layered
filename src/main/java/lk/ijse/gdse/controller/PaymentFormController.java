@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import lk.ijse.gdse.Util.Regex;
 import lk.ijse.gdse.bo.BOFactory;
 import lk.ijse.gdse.bo.custom.PaymentBo;
+import lk.ijse.gdse.entity.Payment;
 import lk.ijse.gdse.model.PaymentDTO;
 import lk.ijse.gdse.model.tm.LoanTm;
 import lk.ijse.gdse.model.tm.PaymentTm;
@@ -36,7 +37,7 @@ public class PaymentFormController {
 
     public TextField txtNic;
     public TableColumn colNic;
-    public JFXComboBox cmbLoanType;
+   // public JFXComboBox cmbLoanType;
     public TableColumn colLoanType;
     public DatePicker txtDate;
     public TextField cmbRateId;
@@ -44,6 +45,7 @@ public class PaymentFormController {
     public JFXButton btnPrint;
     public AnchorPane root;
     public JFXButton btnClear;
+    public TextField cmbLoanType;
     @FXML
     private JFXButton btnBack;
 
@@ -100,17 +102,17 @@ public class PaymentFormController {
         cmbPaymentMethod.setItems(paymentMethod);
     }
 
-    private void initializeComboBoxLoanType() {
-        ObservableList<String> loanType = FXCollections.observableArrayList(
-                "Housing Loan",
-                "Educational Loan",
-                "Personal Loans",
-                "Business Loans",
-                "Awrudu Loan",
-                "Leasing"
-        );
-        cmbLoanType.setItems(loanType);
-    }
+//    private void initializeComboBoxLoanType() {
+//        ObservableList<String> loanType = FXCollections.observableArrayList(
+//                "Housing Loan",
+//                "Educational Loan",
+//                "Personal Loans",
+//                "Business Loans",
+//                "Awrudu Loan",
+//                "Leasing"
+//        );
+//        cmbLoanType.setItems(loanType);
+//    }
 
     @FXML
     void btnClearOnAction(ActionEvent event) {
@@ -119,13 +121,13 @@ public class PaymentFormController {
 
     private void clearFields() {
         //txtInvoiceNo.clear();
-        txtNic.clear();
+      //  txtNic.clear();
         cmbLoanId.clear();
         cmbRateId.clear();
         cmbPaymentMethod.setValue(null);
         txtAmount.clear();
         txtDate.setValue(null);
-        cmbLoanType.setValue(null);
+        cmbLoanType.setText(null);
         txtLateFee.clear();
 
 
@@ -133,7 +135,7 @@ public class PaymentFormController {
 
     public void initialize() throws SQLException, ClassNotFoundException {
         txtInvoiceNo.setText(generateNewId());
-        initializeComboBoxLoanType();
+        //initializeComboBoxLoanType();
         //handleCustomerIdEntered();
         //initializeComboBoxStatus();
         initializeComboBox();
@@ -195,7 +197,7 @@ public class PaymentFormController {
             String paymentMethod = String.valueOf(cmbPaymentMethod.getValue());
             String paymentAmount = txtAmount.getText();
             String paymentDate = String.valueOf(txtDate.getValue());
-            String loanType = String.valueOf(cmbLoanType.getValue());
+            String loanType = cmbLoanType.getText();
             String lateFee = txtLateFee.getText();
 
             PaymentDTO paymentDTO = new PaymentDTO(invoiceNo, nic, loanId, rateId, paymentMethod, paymentAmount, paymentDate, loanType, lateFee);
@@ -226,7 +228,7 @@ public class PaymentFormController {
             String paymentMethod = cmbPaymentMethod.getValue();
             String paymentAmount = txtAmount.getText();
             String paymentDate = String.valueOf(txtDate.getValue());
-            String loanType = String.valueOf(cmbLoanType.getValue());
+            String loanType = cmbLoanType.getText();
             String lateFee = txtLateFee.getText();
 
             PaymentDTO paymentDTO = new PaymentDTO(invoiceNo, nic, loanId, rateId, paymentMethod, paymentAmount, paymentDate, loanType, lateFee);
@@ -294,26 +296,27 @@ public class PaymentFormController {
         Regex.setTextColor(lk.ijse.gdse.Util.TextField.NIC, txtNic);
         String nic = txtNic.getText();
 
-        PaymentDTO paymentDTO = paymentBo.searchByNic(nic);
-        if (paymentDTO != null) {
-            txtInvoiceNo.setText(paymentDTO.getPInvoiceNo());
-            txtNic.setText(paymentDTO.getNic());
-            cmbLoanId.setText(paymentDTO.getLoanId());
-            cmbRateId.setText(paymentDTO.getRateId());
-            cmbPaymentMethod.setValue(paymentDTO.getPaymentMethod());
-            txtAmount.setText(paymentDTO.getPaymentAmount());
-            txtDate.setValue(LocalDate.parse(paymentDTO.getPaymentDate()));
-            cmbLoanType.setValue(paymentDTO.getLoanType());
+        PaymentDTO payment = paymentBo.searchByNic(nic);
+        if (payment != null) {
+           // txtInvoiceNo.setText(payment.getPInvoiceNo());
+            txtNic.setText(payment.getNic());
+            cmbLoanId.setText(payment.getLoanId());
+            cmbRateId.setText(payment.getRateId());
+            cmbPaymentMethod.setValue(payment.getPaymentMethod());
+            txtAmount.setText(payment.getPaymentAmount());
+           // txtDate.setValue(LocalDate.parse(payment.getPaymentDate()));
+            cmbLoanType.setText(payment.getLoanType());
 
-            calculateLateFee(paymentDTO);
+            calculateLateFee(payment);
 
         } else {
-
+            cmbLoanType.setText("null");
+            cmbRateId.setText("null");
+            cmbLoanId.setText("null");
             new Alert(Alert.AlertType.ERROR, "Loan details not found for NIC: " + nic).show();
         }
     }
-
-    private void calculateLateFee(PaymentDTO paymentDTO) throws ClassNotFoundException {
+    private void calculateLateFee(PaymentDTO payment) throws ClassNotFoundException {
         LocalDate paymentDate = txtDate.getValue();
         String nic = txtNic.getText();
 
@@ -343,7 +346,6 @@ public class PaymentFormController {
             e.printStackTrace();
         }
     }
-
     private int calculateMonthsSinceLoan(LocalDate loanDate, LocalDate paymentDate) {
         return Period.between(loanDate.withDayOfMonth(1), paymentDate.withDayOfMonth(1)).getMonths();
     }

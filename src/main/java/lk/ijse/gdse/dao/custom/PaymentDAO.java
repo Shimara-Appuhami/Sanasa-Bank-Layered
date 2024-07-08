@@ -15,6 +15,7 @@ public interface PaymentDAO extends CrudDAO<Payment> {
     public  String getLoanIdByNIC(String nic) throws SQLException ,ClassNotFoundException;
     public  List<PaymentDTO> getPaymentsByNIC(String nic) throws SQLException ,ClassNotFoundException;
     public  String getLoanType(String nic) throws SQLException,ClassNotFoundException;
+    public  String getRateId(String loanType) throws SQLException,ClassNotFoundException;
 
 
 

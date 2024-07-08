@@ -7,4 +7,6 @@ import java.sql.SQLException;
 
 public interface InquiryDAO extends CrudDAO<Inquiry> {
     Inquiry searchByNic(String nic) throws SQLException, ClassNotFoundException;
+    String getCustomerId(String nic) throws SQLException, ClassNotFoundException;
+
 }

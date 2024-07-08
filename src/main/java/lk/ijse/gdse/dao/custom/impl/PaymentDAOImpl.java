@@ -69,20 +69,16 @@ public class PaymentDAOImpl implements PaymentDAO {
 
     @Override
     public Payment searchByNic(String nic) throws SQLException, ClassNotFoundException {
-        ResultSet rst = SQLUtil.execute("SELECT * FROM payment WHERE nic = ?;",nic);
+        ResultSet rst = SQLUtil.execute("SELECT l.loan_id,l.loan_type,ir.rate_id FROM loan l JOIN interest_rate ir ON l.loan_type = ir.loan_type WHERE l.nic = ?;",nic);
         if (rst.next()) {
-            return new Payment(
-                    rst.getString("p_invoice_no"),
-                    rst.getString("nic"),
-                    rst.getString("loan_id"),
-                    rst.getString("rate_id"),
-                    rst.getString("p_method"),
-                    rst.getString("p_amount"),
-                    rst.getString("p_date"),
-                    rst.getString("loan_type"),
-                    rst.getString("late_fee")
-            );
+            String loanId = rst.getString("loan_id");
+            String loanType = rst.getString("loan_type");
+            String rateId = rst.getString("rate_id");
+
+            // Assuming Payment has a constructor that takes loanId, loanType, and rateId
+            return new Payment(loanId, loanType, rateId);
         }
+
         return null;
     }
 
@@ -106,7 +102,7 @@ public class PaymentDAOImpl implements PaymentDAO {
 
     @Override
     public String getLoanIdByNIC(String nic) throws SQLException, ClassNotFoundException {
-        ResultSet rst = SQLUtil.execute("SELECT loan_id FROM customer_loan_details WHERE c_id = (SELECT c_id FROM customer WHERE nic = ?)");
+        ResultSet rst = SQLUtil.execute("SELECT loan_id FROM customer_loan_details WHERE c_id = (SELECT c_id FROM customer WHERE nic = ?)",nic);
         if (rst.next()) {
             return rst.getString("loan_id");
         }
@@ -144,6 +140,16 @@ public class PaymentDAOImpl implements PaymentDAO {
             return rst.getString("loan_type");
         }
         return null;
+    }
+
+    @Override
+    public String getRateId(String loanType) throws SQLException, ClassNotFoundException {
+        ResultSet rst = SQLUtil.execute("SELECT ir.rate_id FROM interest_rate ir WHERE ir.loan_type =?", loanType);
+        if (rst.next()) {
+            return rst.getString("rate_id");
+        }
+        return null;
+
     }
 
 }
