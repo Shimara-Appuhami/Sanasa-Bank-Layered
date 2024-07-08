@@ -16,9 +16,12 @@ public class CustomerTm implements Comparable<CustomerTm> {
     private String c_address;
     private String c_age;
     private String date_of_birth;
+
+    private String annual_income;
     private String nic;
     private String registration_date;
-    private String annual_income;
+
+
 
     @Override
     public int compareTo(CustomerTm o) {

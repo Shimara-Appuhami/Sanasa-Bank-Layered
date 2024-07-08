@@ -1,6 +1,8 @@
 package lk.ijse.gdse.dao;
 
-import lk.ijse.gdse.dao.custom.impl.CustomerDAOImpl;
+import lk.ijse.gdse.bo.custom.impl.*;
+import lk.ijse.gdse.dao.custom.impl.*;
+import lk.ijse.gdse.entity.Account;
 
 public class DAOFactory {
     private static DAOFactory daoFactory;
@@ -12,12 +14,31 @@ public class DAOFactory {
         return daoFactory==null? new DAOFactory():daoFactory;
     }
     public enum DAOTypes{
-        CUSTOMER
+        CUSTOMER,ACCOUNT,BALANCE,CUSTOMERLOAN,EMPLOYEE,INQUIRY,INTERESTRATE,LOAN,PAYMENT,REMINDER
     }
     public SuperDAO getDAO(DAOTypes daoTypes ){
         switch (daoTypes){
-            case CUSTOMER:
+            case CUSTOMER :
                 return new CustomerDAOImpl();
+            case ACCOUNT:
+                return new AccountDAOImpl();
+            case BALANCE :
+                return new BalanceDAOImpl();
+            case CUSTOMERLOAN:
+                return new CustomerLoanDAOImpl();
+            case EMPLOYEE :
+                return new EmployeeDAOImpl();
+            case INQUIRY :
+                return new InquiryDAOImpl();
+            case INTERESTRATE :
+                return new InterestRateDAOImpl();
+            case LOAN:
+                return new LoanDAOImpl();
+            case PAYMENT :
+                return new PaymentDAOImpl();
+            case REMINDER :
+                return new ReminderDAOImpl();
+
 
             default:
                 return null;

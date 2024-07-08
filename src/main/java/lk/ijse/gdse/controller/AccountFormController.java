@@ -10,15 +10,21 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import lk.ijse.gdse.Util.Regex;
-import lk.ijse.gdse.model.Account;
+import lk.ijse.gdse.bo.BOFactory;
+import lk.ijse.gdse.bo.custom.AccountBo;
+import lk.ijse.gdse.bo.custom.CustomerBo;
+import lk.ijse.gdse.bo.custom.LoanBo;
+import lk.ijse.gdse.model.AccountDTO;
 
 import lk.ijse.gdse.model.tm.AccountTm;
-import lk.ijse.gdse.repository.AccountRepo;
-import lk.ijse.gdse.repository.LoanRepo;
+import lk.ijse.gdse.model.tm.CustomerTm;
+
 
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class AccountFormController {
@@ -31,35 +37,32 @@ public class AccountFormController {
     public TextField txtNic;
     public DatePicker txtOpenDate;
     @FXML
-    private TableColumn<Account, String> colAccountBalance;
+    private TableColumn<AccountDTO, String> colAccountBalance;
 
     @FXML
-    private TableColumn<Account, String> colAccountType;
+    private TableColumn<AccountDTO, String> colAccountType;
 
     @FXML
-    private TableColumn<Account, String> colCustomerId;
+    private TableColumn<AccountDTO, String> colCustomerId;
 
     @FXML
-    private TableColumn<Account, String> colOpenDate;
+    private TableColumn<AccountDTO, String> colOpenDate;
 
     @FXML
-    private TableColumn<Account, String> colStatus;
+    private TableColumn<AccountDTO, String> colStatus;
 
     @FXML
-    private TableColumn<Account, String> colaccountNo;
+    private TableColumn<AccountDTO, String> colaccountNo;
 
     @FXML
     private TableView<AccountTm> tblAccount;
 
     @FXML
     private TextField txtAccountBalance;
-
-
-
-
-
     @FXML
     private TextField txtaccountNo;
+
+    AccountBo accountBo= (AccountBo) BOFactory.getBoFactory().getBo(BOFactory.BoTypes.ACCOUNT);
     private void initializeComboBoxType() {
         ObservableList<String> accountType = FXCollections.observableArrayList(
                 "Saving Account",
@@ -92,12 +95,12 @@ public class AccountFormController {
 
 
     @FXML
-    void btnDeleteOnAction(ActionEvent actionEvent) {
+    void btnDeleteOnAction(ActionEvent actionEvent) throws ClassNotFoundException {
         String accountNo = txtaccountNo.getText();
 
         if (!accountNo.isEmpty()) {
             try {
-                boolean isDeleted = AccountRepo.delete(accountNo);
+                boolean isDeleted = accountBo.deleteAccount(accountNo);
                 if (isDeleted) {
                     new Alert(Alert.AlertType.CONFIRMATION, "Account deleted successfully!").show();
                     initialize();
@@ -115,7 +118,7 @@ public class AccountFormController {
 
 
     @FXML
-    void btnSaveOnAction(ActionEvent event) {
+    void btnSaveOnAction(ActionEvent event) throws ClassNotFoundException {
         String accountNo = txtaccountNo.getText();
         String CustomerId = String.valueOf(cmbCustomerId.getValue());
         String AccountType = cmbAccountType.getValue();
@@ -124,11 +127,11 @@ public class AccountFormController {
         String Status = cmbStatus.getValue();
 
 
-        Account account = new Account(accountNo, CustomerId, AccountType, AccountBalance,OpenDate,Status);
+        AccountDTO accountDTO = new AccountDTO(accountNo, CustomerId, AccountType, AccountBalance,OpenDate,Status);
 
 
         try {if(isValied()){
-            boolean isSaved = AccountRepo.save(account);
+            boolean isSaved = accountBo.saveAccount(accountDTO);
             if (isSaved) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Account saved successfully").show();
                 initialize();
@@ -144,7 +147,7 @@ public class AccountFormController {
 
 
     @FXML
-    void btnUpdateOnAction(ActionEvent event) {
+    void btnUpdateOnAction(ActionEvent event) throws ClassNotFoundException {
         String accountNo = txtaccountNo.getText();
         String CustomerId = String.valueOf(cmbCustomerId.getValue());
         String AccountType = cmbAccountType.getValue();
@@ -153,9 +156,9 @@ public class AccountFormController {
         String Status = cmbStatus.getValue();
 
 
-        Account account = new Account(accountNo, CustomerId, AccountType, AccountBalance,OpenDate,Status);
+        AccountDTO accountDTO = new AccountDTO(accountNo, CustomerId, AccountType, AccountBalance,OpenDate,Status);
         try {if(isValied()){
-            boolean isUpdated = AccountRepo.update(account);
+            boolean isUpdated = accountBo.updateAccount(accountDTO);
 
             if (isUpdated) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Account updated").show();
@@ -170,21 +173,21 @@ public class AccountFormController {
         }
     }
     @FXML
-    void txtSearchOnAction(ActionEvent event) throws SQLException {
+    void txtSearchOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         String nic = txtNic.getText();
 
 
-            Account account = AccountRepo.searchById(nic);
-            if (account != null) {
-                txtaccountNo.setText(account.getANo());
-                cmbCustomerId.setValue(account.getCId());
-                cmbAccountType.setValue(account.getAType());
-                txtAccountBalance.setText(account.getABalance());
-                txtOpenDate.setValue(LocalDate.parse(account.getOpenDate()));
-                cmbStatus.setValue(account.getStatus());
+            AccountDTO accountDTO = accountBo.searchByNicAccount(nic);
+            if (accountDTO != null) {
+                txtaccountNo.setText(accountDTO.getANo());
+                cmbCustomerId.setValue(accountDTO.getCId());
+                cmbAccountType.setValue(accountDTO.getAType());
+                txtAccountBalance.setText(accountDTO.getABalance());
+                txtOpenDate.setValue(LocalDate.parse(accountDTO.getOpenDate()));
+                cmbStatus.setValue(accountDTO.getStatus());
 
             } else {
-                String customerId = LoanRepo.getCustId(nic);
+                String customerId = accountBo.getCustomerId(nic);
                 if (customerId != null) {
                     cmbCustomerId.setValue(customerId);
                     new Alert(Alert.AlertType.INFORMATION, "Customer ID is found").show();
@@ -220,14 +223,17 @@ public class AccountFormController {
 
 
 }*/
-    public void initialize() throws SQLException {
+    public void initialize() throws SQLException, ClassNotFoundException {
+        txtaccountNo.setText(generateNewId());
+
         getAccountIds();
         initializeComboBoxStatus();
         initializeComboBoxType();
-        lastAccountId();
+       // generateNewId();
         setDate();
         setCellValueFactory();
         loadAllCustomers();
+        addTableSelectionListener();
     }
     @FXML
 
@@ -240,19 +246,19 @@ public class AccountFormController {
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
 
-    private void loadAllCustomers() {
+    private void loadAllCustomers() throws ClassNotFoundException {
         ObservableList<AccountTm> obList = FXCollections.observableArrayList();
 
         try {
-            List<Account> accountList = AccountRepo.getAll();
-            for (Account account : accountList) {
+            List<AccountDTO> accountDTOList = accountBo.getAllAccounts();
+            for (AccountDTO accountDTO : accountDTOList) {
                 AccountTm tm = new AccountTm(
-                        account.getANo(),
-                        account.getCId(),
-                        account.getAType(),
-                        account.getABalance(),
-                        account.getOpenDate(),
-                        account.getStatus()
+                        accountDTO.getANo(),
+                        accountDTO.getCId(),
+                        accountDTO.getAType(),
+                        accountDTO.getABalance(),
+                        accountDTO.getOpenDate(),
+                        accountDTO.getStatus()
                 );
 
                 obList.add(tm);
@@ -285,32 +291,33 @@ public class AccountFormController {
 
     }
 
-    private void lastAccountId() {
+    private String getLastAccountId(){//limit quiry eken last eka gannawa
+        List<AccountTm> tempAccountList = new ArrayList<>(tblAccount.getItems());
+        Collections.sort(tempAccountList);
+        return tempAccountList.get(tempAccountList.size() - 1).getC_id();
+    }
+
+    private String generateNewId() {
         try {
-            String lastId = AccountRepo.getLastAccountId();
-            String nextId = generateNextId(lastId);
-            txtaccountNo.setText(nextId);
+            //Generate New ID
+            return accountBo.generateNewAccountId();
+
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next Account No: " + e.getMessage());
+            new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-    }
 
-    private String generateNextId(String lastId) {
-        String nextId = null;
-        try {
-            if (lastId != null && !lastId.isEmpty()) {
-                int lastNumericId = Integer.parseInt(lastId.substring(1)); // Extract numeric part of the ID
-                int nextNumericId = lastNumericId + 1;
-                nextId = String.format("A%03d", nextNumericId);
-            } else {
-                nextId = "A001";
-            }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next Account no: Invalid ID format");
+
+        if (tblAccount.getItems().isEmpty()) {
+            return "A001";
+        } else {
+            String id = getLastAccountId();
+            int newCustomerId = Integer.parseInt(id.replace("A", "")) + 1;
+            return String.format("A%03d", newCustomerId);
         }
-        return nextId;
-    }
 
+    }
     private void showAlert(Alert.AlertType alertType, String message) {
         new Alert(alertType, message).show();
     }
@@ -318,11 +325,11 @@ public class AccountFormController {
         LocalDate now = LocalDate.now();
         txtOpenDate.setValue(LocalDate.parse(String.valueOf(now)));
     }
-    private void getAccountIds() {
+    private void getAccountIds() throws ClassNotFoundException {
         ObservableList<String> obList = FXCollections.observableArrayList();
 
         try {
-            List<String> idList = AccountRepo.getIds();
+            List<String> idList = accountBo.getIdsAccount();
 
             for(String id : idList) {
                 obList.add(id);
@@ -351,5 +358,18 @@ public class AccountFormController {
         if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.NIC,txtNic)) return false;
 
         return true;
+    }
+    private void addTableSelectionListener() {
+        tblAccount.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                AccountTm selectedAccount = newValue;
+                txtaccountNo.setText(selectedAccount.getA_no());
+                cmbCustomerId.setValue(selectedAccount.getC_id());
+                cmbAccountType.setValue(selectedAccount.getA_type());
+                txtAccountBalance.setText(selectedAccount.getA_balance());
+                txtOpenDate.setValue(LocalDate.parse(selectedAccount.getOpen_date()));
+                cmbStatus.setValue(selectedAccount.getStatus());
+            }
+        });
     }
 }

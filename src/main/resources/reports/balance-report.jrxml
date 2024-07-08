@@ -20,64 +20,64 @@
 	p.p_method,
 	p.p_date,
 	p.late_fee
-FROM sanasa.payment p
-	JOIN sanasa.loan l ON 
+	FROM sanasa.payment p
+	JOIN sanasa.loan l ON
 	 p.loan_id=l.loan_id]]>
 	</queryString>
 	<field name="p_invoice_no" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="p_invoice_no"/>
 		<property name="com.jaspersoft.studio.field.label" value="p_invoice_no"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<field name="p_amount" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="p_amount"/>
 		<property name="com.jaspersoft.studio.field.label" value="p_amount"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<field name="loan_amount" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="loan_amount"/>
 		<property name="com.jaspersoft.studio.field.label" value="loan_amount"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="loan"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="loanDTO"/>
 	</field>
 	<field name="loan_term" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="loan_term"/>
 		<property name="com.jaspersoft.studio.field.label" value="loan_term"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="loan"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="loanDTO"/>
 	</field>
 	<field name="loan_type" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="loan_type"/>
 		<property name="com.jaspersoft.studio.field.label" value="loan_type"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="loan"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="loanDTO"/>
 	</field>
 	<field name="percentage" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="percentage"/>
 		<property name="com.jaspersoft.studio.field.label" value="percentage"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="loan"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="loanDTO"/>
 	</field>
 	<field name="nic" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="nic"/>
 		<property name="com.jaspersoft.studio.field.label" value="nic"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="loan"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="loanDTO"/>
 	</field>
 	<field name="date" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="date"/>
 		<property name="com.jaspersoft.studio.field.label" value="date"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="loan"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="loanDTO"/>
 	</field>
 	<field name="p_method" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="p_method"/>
 		<property name="com.jaspersoft.studio.field.label" value="p_method"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<field name="p_date" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="p_date"/>
 		<property name="com.jaspersoft.studio.field.label" value="p_date"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<field name="late_fee" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="late_fee"/>
 		<property name="com.jaspersoft.studio.field.label" value="late_fee"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<background>
 		<band splitType="Stretch"/>

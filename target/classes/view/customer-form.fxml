@@ -104,6 +104,6 @@
       </Label>
       <TextField fx:id="txtRegistration" layoutX="460.0" layoutY="86.0" onAction="#txtRegistrationOnAction" promptText="registraion date" />
       <TextField fx:id="txtIncome" layoutX="460.0" layoutY="115.0" onAction="#txtIncomeOnAction" promptText="annual income" />
-      <TextField fx:id="txtInquiryId" layoutX="460.0" layoutY="146.0" onAction="#txtInquiryIdOnAction" promptText="inquiry id" />
+      <TextField fx:id="txtInquiryId" layoutX="460.0" layoutY="146.0" onAction="#txtInquiryIdOnAction" promptText="inquiryDTO id" />
    </children>
 </AnchorPane>

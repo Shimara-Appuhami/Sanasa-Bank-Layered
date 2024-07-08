@@ -5,44 +5,44 @@
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter (14)"/>
 	<parameter name="p_txtNic" class="java.lang.String"/>
 	<queryString language="SQL">
-		<![CDATA[SELECT sanasa.payment.p_invoice_no, sanasa.payment.loan_id, sanasa.payment.loan_type, sanasa.payment.p_amount, sanasa.payment.p_method, sanasa.payment.late_fee, sanasa.payment.p_date
-    FROM sanasa.payment
-    WHERE sanasa.payment.nic = $P{p_txtNic}]]>
+		<![CDATA[SELECT sanasa.paymentDTO.p_invoice_no, sanasa.paymentDTO.loan_id, sanasa.paymentDTO.loan_type, sanasa.paymentDTO.p_amount, sanasa.paymentDTO.p_method, sanasa.paymentDTO.late_fee, sanasa.paymentDTO.p_date
+    FROM sanasa.paymentDTO
+    WHERE sanasa.paymentDTO.nic = $P{p_txtNic}]]>
 	</queryString>
 	<field name="p_invoice_no" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="p_invoice_no"/>
 		<property name="com.jaspersoft.studio.field.label" value="p_invoice_no"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<field name="loan_id" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="loan_id"/>
 		<property name="com.jaspersoft.studio.field.label" value="loan_id"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<field name="loan_type" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="loan_type"/>
 		<property name="com.jaspersoft.studio.field.label" value="loan_type"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<field name="p_amount" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="p_amount"/>
 		<property name="com.jaspersoft.studio.field.label" value="p_amount"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<field name="p_method" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="p_method"/>
 		<property name="com.jaspersoft.studio.field.label" value="p_method"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<field name="late_fee" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="late_fee"/>
 		<property name="com.jaspersoft.studio.field.label" value="late_fee"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<field name="p_date" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="p_date"/>
 		<property name="com.jaspersoft.studio.field.label" value="p_date"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="payment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="paymentDTO"/>
 	</field>
 	<group name="p_invoice_no">
 		<groupExpression><![CDATA[$F{p_invoice_no}]]></groupExpression>

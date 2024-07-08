@@ -15,15 +15,19 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lk.ijse.gdse.Util.Regex;
+import lk.ijse.gdse.bo.BOFactory;
+import lk.ijse.gdse.bo.custom.LoanBo;
 import lk.ijse.gdse.db.DbConnection;
-import lk.ijse.gdse.model.CustomerLoan;
-import lk.ijse.gdse.model.Loan;
-import lk.ijse.gdse.model.tm.CartTm;
+import lk.ijse.gdse.entity.InterestRate;
+import lk.ijse.gdse.entity.Loan;
+import lk.ijse.gdse.model.CustomerLoanDTO;
+import lk.ijse.gdse.model.LoanDTO;
+import lk.ijse.gdse.model.tm.CustomerLoanTm;
+import lk.ijse.gdse.model.tm.CustomerTm;
 import lk.ijse.gdse.model.tm.InterestRateTm;
 import lk.ijse.gdse.model.tm.LoanTm;
 
 import lk.ijse.gdse.repository.CustomerLoanRepo;
-import lk.ijse.gdse.repository.LoanRepo;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
@@ -33,6 +37,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LoanFormController {
@@ -52,16 +57,16 @@ public class LoanFormController {
     public DatePicker txtDate;
     public JFXButton btnPrint;
     @FXML
-    private TableColumn<Loan, String> colApplication;
+    private TableColumn<LoanDTO, String> colApplication;
 
     @FXML
-    private TableColumn<Loan, String> colLoanAmount;
+    private TableColumn<LoanDTO, String> colLoanAmount;
 
     @FXML
-    private TableColumn<Loan, String> colLoanId;
+    private TableColumn<LoanDTO, String> colLoanId;
 
     @FXML
-    private TableColumn<Loan, String> colLoanType;
+    private TableColumn<LoanDTO, String> colLoanType;
 
     @FXML
     private TableView<LoanTm> tblLoan;
@@ -76,7 +81,10 @@ public class LoanFormController {
 
     @FXML
     private JFXComboBox<String> cmbApplicationType;
-    private final ObservableList<CartTm> obList = FXCollections.observableArrayList();
+
+    LoanBo loanBo= (LoanBo) BOFactory.getBoFactory().getBo(BOFactory.BoTypes.LOAN);
+
+    private final ObservableList<CustomerLoanTm> obList = FXCollections.observableArrayList();
 
 
     private void initializeComboBox() {
@@ -120,12 +128,12 @@ public class LoanFormController {
     }
 
     @FXML
-    void btnDeleteOnAction(ActionEvent event) throws SQLException {
+    void btnDeleteOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         String loanId = txtLoanId.getText();
 
         if (!loanId.isEmpty()) {
             try {
-                boolean isDeleted = LoanRepo.delete(loanId);
+                boolean isDeleted = loanBo.deleteLoan(loanId);
                 if (isDeleted) {
                     new Alert(Alert.AlertType.CONFIRMATION, "Loan deleted successfully!").show();
                     initialize();
@@ -142,7 +150,7 @@ public class LoanFormController {
     }
 
     @FXML
-    void btnSaveOnAction(ActionEvent event) throws SQLException {
+    void btnSaveOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
 
         String loanId = txtLoanId.getText();
         String application = cmbApplicationType.getValue();
@@ -157,31 +165,31 @@ public class LoanFormController {
         String date= String.valueOf(txtDate.getValue());
 
 
-        Loan loan = new Loan();
-        loan.setLoanId(loanId);
-        loan.setApplication(application);
-        loan.setLoanAmount(loanAmount);
-        loan.setLoanType(loanType);
-        loan.setLoanTerm(loanTerm);
-        loan.setCollateral(collateral);
-        loan.setPurpose(purpose);
-        loan.setCustomerId(customerId);
-        loan.setPercentage(Double.parseDouble(percentage));
-        loan.setNic(nic);
-        loan.setDate(date);
+        LoanDTO loanDTO = new LoanDTO();
+        loanDTO.setLoanId(loanId);
+        loanDTO.setApplication(application);
+        loanDTO.setLoanAmount(loanAmount);
+        loanDTO.setLoanType(loanType);
+        loanDTO.setLoanTerm(loanTerm);
+        loanDTO.setCollateral(collateral);
+        loanDTO.setPurpose(purpose);
+        loanDTO.setCustomerId(customerId);
+        loanDTO.setPercentage(Double.parseDouble(percentage));
+        loanDTO.setNic(nic);
+        loanDTO.setDate(date);
 
         try {
             DbConnection.getInstance().getConnection().setAutoCommit(false);
             if (isValied()) {
-                boolean isLoanSaved = LoanRepo.save(loan);
+                boolean isLoanSaved = loanBo.saveLoan(loanDTO);
                 if (isLoanSaved) {
-                    CustomerLoan customerLoan = new CustomerLoan(loanId, customerId);
+                    CustomerLoanDTO customerLoanDTO = new CustomerLoanDTO(loanId, customerId);
 
-                    List<CustomerLoan> customerLoanList = new ArrayList<>();
-                    customerLoanList.add(customerLoan);
+                    List<CustomerLoanDTO> customerLoanDTOList = new ArrayList<>();
+                    customerLoanDTOList.add(customerLoanDTO);
 
                     CustomerLoanRepo customerLoanRepo = new CustomerLoanRepo();
-                    boolean isSaved = customerLoanRepo.saveCustomerLoan(customerLoanList);
+                    boolean isSaved = customerLoanRepo.saveCustomerLoan(customerLoanDTOList);
 
                     if (isSaved) {
                         new Alert(Alert.AlertType.INFORMATION, "Customer loan details Transaction saved successfully.").show();
@@ -199,12 +207,11 @@ public class LoanFormController {
                 DbConnection.getInstance().getConnection().rollback();
             }
         } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR, "Error saving loan: " ).show();
+            new Alert(Alert.AlertType.ERROR, "Error saving loan: "+ e.getMessage()).show();
         }
     }
 
-    @FXML
-    void btnUpdateOnAction(ActionEvent event) {
+    public void btnUpdateOnAction(ActionEvent event) {
         String loanId = txtLoanId.getText();
         String application = cmbApplicationType.getValue();
         String loanAmount = txtLoanAmount.getText();
@@ -213,35 +220,32 @@ public class LoanFormController {
         String collateral = txtollateral.getText();
         String purpose = txtpurpose.getText();
         String customerId = txtCustomerId.getText();
+        String percentage = txtPercentage.getText();
         String nic = txtNic.getText();
-        String date = String.valueOf(txtDate.getValue());
+        LocalDate date = txtDate.getValue();
+
+        LoanDTO loanDTO = new LoanDTO(loanId, customerId, application, loanAmount, loanType, loanTerm, collateral, purpose, Double.parseDouble(percentage), nic, date.toString());
 
         try {
-            String percentage = txtPercentage.getText();
-                         Loan loan = new Loan(loanId, application, loanAmount, loanType, loanTerm, collateral, purpose, customerId, percentage, nic,date);
-                boolean isUpdated = LoanRepo.update(loan);
+            boolean isUpdated = loanBo.updateLoan(loanDTO);
+            if (isUpdated) {
+                new Alert(Alert.AlertType.CONFIRMATION, "Loan updated successfully").show();
+                initialize();
+                clearFields();
+            }
+        } catch(SQLException | ClassNotFoundException e){
+                new Alert(Alert.AlertType.ERROR, "Error updating loan: " + e.getMessage()).show();
+             }
 
-                if (isUpdated) {
-                    new Alert(Alert.AlertType.CONFIRMATION, "Loan updated successfully").show();
-                    initialize();
-                    clearFields();
-                } else {
-                    new Alert(Alert.AlertType.WARNING, "Loan update failed").show();
-                }
-        } catch (NumberFormatException e) {
-            new Alert(Alert.AlertType.ERROR, "Invalid percentage format").show();
-        } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR, "Error updating loan: ").show();
-        }
     }
-
-    public void initialize() {
+    public void initialize() throws ClassNotFoundException {
         setDate();
         initializeComboBoxLoanType();
         initializeComboBox();
-        lastLoanId();
+
         setCellValueFactory();
         loadAllLoans();
+        txtLoanId.setText(generateNewId());
     }
 
     public void setCellValueFactory() {
@@ -258,34 +262,34 @@ public class LoanFormController {
 
     }
 
-    private void loadAllLoans() {
+    public void loadAllLoans() throws ClassNotFoundException {
         try {
-            List<LoanTm> loanList = LoanRepo.getAll();
+            List<LoanDTO> loanList = loanBo.getAllLoans();
             tblLoan.getItems().clear();
-            for (LoanTm loan : loanList) {
-                LoanTm tm = new LoanTm(loan.getLoan_id(), loan.getApplication(), loan.getLoan_amount(), loan.getLoan_type(), loan.getLoan_term(), loan.getCollateral(), loan.getPurpose(), loan.getC_id(), loan.getPercentage(), loan.getNic(),loan.getDate());
+            for (LoanDTO loan : loanList) {
+                LoanTm tm = new LoanTm(loan.getLoanId(), loan.getApplication(), loan.getLoanAmount(), loan.getLoanType(), loan.getLoanTerm(), loan.getCollateral(), loan.getPurpose(), loan.getCustomerId(), loan.getPercentage(), loan.getNic(),loan.getDate());
                 tblLoan.getItems().add(tm);
             }
         } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR, "Error loading loans: " ).show();
+            new Alert(Alert.AlertType.ERROR, "Error loading loans: " +e.getMessage()).show();
         }
     }
 
     @FXML
-    void txtSearchOnAction(ActionEvent event) throws SQLException {
+    void txtSearchOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         Regex.setTextColor(lk.ijse.gdse.Util.TextField.NIC, txtNic);
         String nic = txtNic.getText();
 
 
-        LoanTm loan = LoanRepo.searchById(nic);
+        LoanDTO loan = loanBo.searchByNic(nic);
         if (loan != null) {
 
-            txtLoanId.setText(loan.getLoan_id());
-            txtCustomerId.setText(loan.getC_id());
+            txtLoanId.setText(loan.getLoanId());
+            txtCustomerId.setText(loan.getCustomerId());
             cmbApplicationType.setValue(loan.getApplication());
-            txtLoanAmount.setText(loan.getLoan_amount());
-            cmbLoanType.setValue(loan.getLoan_type());
-            txtLoanTerm.setText(loan.getLoan_term());
+            txtLoanAmount.setText(loan.getLoanAmount());
+            cmbLoanType.setValue(loan.getLoanType());
+            txtLoanTerm.setText(loan.getLoanTerm());
             txtollateral.setText(loan.getCollateral());
             txtpurpose.setText(loan.getPurpose());
             txtPercentage.setText(String.valueOf(loan.getPercentage()));
@@ -294,7 +298,7 @@ public class LoanFormController {
 
 
         } else {
-            String customerId = LoanRepo.getCustId(nic);
+            String customerId = loanBo.getCustomerId(nic);
             if (customerId != null) {
                 txtCustomerId.setText(customerId);
                 new Alert(Alert.AlertType.INFORMATION, "Your Customer ID is found").show();
@@ -347,37 +351,31 @@ public class LoanFormController {
         stage.setTitle("Dashboard Form");
     }
 
-    private void lastLoanId() {
+    private String getLastCustomerId(){//limit quiry eken last eka gannawa
+        List<LoanTm> tempCustomersList = new ArrayList<>(tblLoan.getItems());
+        Collections.sort(tempCustomersList);
+        return tempCustomersList.get(tempCustomersList.size() - 1).getLoan_id();
+    }
+
+    private String generateNewId() {
         try {
-            String lastId = LoanRepo.getLastLoanId();
-            String nextId = generateNextId(lastId);
-            txtLoanId.setText(nextId);
+            //Generate New ID
+            return loanBo.generateNewLoanID();
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: ");
+            new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-    }
 
-    private String generateNextId(String lastId) {
-        String nextId = null;
-        try {
-            if (lastId != null && !lastId.isEmpty()) {
-                int lastNumericId = Integer.parseInt(lastId.substring(1));
-                int nextNumericId = lastNumericId + 1;
-                nextId = String.format("L%03d", nextNumericId);
-            } else {
-                nextId = "L001";
-            }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: Invalid ID format");
+
+        if (tblLoan.getItems().isEmpty()) {
+            return "L001";
+        } else {
+            String id = getLastCustomerId();
+            int newCustomerId = Integer.parseInt(id.replace("L", "")) + 1;
+            return String.format("L%03d", newCustomerId);
         }
-        return nextId;
-    }
 
-    private void showAlert(Alert.AlertType alertType, String message) {
-        new Alert(alertType, message).show();
-    }
-
-    public void txtLoanTermOnAction(ActionEvent event) {
     }
 
     public void txtollateralOnAction(ActionEvent event) {
@@ -386,9 +384,9 @@ public class LoanFormController {
     public void txtpurposeOnAction(ActionEvent event) {
     }
 
-    public void cmbLoanTypeOnAction(ActionEvent event) {
+    public void cmbLoanTypeOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         String type = (String) cmbLoanType.getValue();
-        InterestRateTm loan = LoanRepo.searchByLoanType(type);
+        InterestRate loan = loanBo.searchByLoanType(type);
         if (loan != null) {
 
 //            txtLoanId.setText(loan.getLoan_id());
@@ -436,7 +434,7 @@ public class LoanFormController {
         if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.TERM, txtLoanTerm)) return false;
         if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.NAME, txtollateral)) return false;
         if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.LOANID, txtLoanId)) return false;
-          if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.AMOUNT,txtLoanAmount)) return false;
+        if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.AMOUNT,txtLoanAmount)) return false;
         if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.NIC, txtNic)) return false;
         if (!Regex.setTextColor(lk.ijse.gdse.Util.TextField.PERCENTAGE, txtPercentage)) return false;
 
@@ -463,5 +461,9 @@ public class LoanFormController {
 
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, DbConnection.getInstance().getConnection());
         JasperViewer.viewReport(jasperPrint,false);
+    }
+
+    public void txtLoanTermOnAction(ActionEvent actionEvent) {
+
     }
 }

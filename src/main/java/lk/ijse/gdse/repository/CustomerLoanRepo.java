@@ -1,8 +1,7 @@
 package lk.ijse.gdse.repository;
 
-import javafx.scene.control.Alert;
 import lk.ijse.gdse.db.DbConnection;
-import lk.ijse.gdse.model.CustomerLoan;
+import lk.ijse.gdse.model.CustomerLoanDTO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,7 +15,7 @@ public class CustomerLoanRepo {
         connection = DbConnection.getInstance().getConnection();
     }
 
-    public boolean saveCustomerLoan(List<CustomerLoan> clList) throws SQLException {
+    public boolean saveCustomerLoan(List<CustomerLoanDTO> clList) throws SQLException {
         if (clList.isEmpty()) {
             return true;
         }
@@ -25,7 +24,7 @@ public class CustomerLoanRepo {
         String sql = "INSERT INTO customer_loan_details (loan_id, c_id) VALUES (?, ?)";
         try (PreparedStatement pst = connection.prepareStatement(sql)) {
             //           DbConnection.getInstance().getConnection().setAutoCommit(false);
-            for (CustomerLoan cl : clList) {
+            for (CustomerLoanDTO cl : clList) {
                 pst.setString(1, cl.getLoanId());
                 pst.setString(2, cl.getCustomerId());
                 pst.addBatch();

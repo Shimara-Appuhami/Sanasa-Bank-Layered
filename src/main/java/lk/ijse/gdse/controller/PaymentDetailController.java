@@ -10,9 +10,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import lk.ijse.gdse.Util.Regex;
+import lk.ijse.gdse.bo.BOFactory;
+import lk.ijse.gdse.bo.custom.InquiryBo;
+import lk.ijse.gdse.bo.custom.PaymentBo;
 import lk.ijse.gdse.db.DbConnection;
-import lk.ijse.gdse.model.Payment;
-import lk.ijse.gdse.repository.PaymentRepo;
+import lk.ijse.gdse.model.PaymentDTO;
+
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
@@ -24,19 +27,21 @@ import java.util.List;
 import java.util.Map;
 
 public class PaymentDetailController {
-    public TableColumn<String, Payment> colInvoice;
-    public TableColumn<String, Payment> colLoanId;
-    public TableColumn<String, Payment> colLoanType;
-    public TableColumn<Double, Payment> colAmount;
-    public TableColumn<String, Payment> colPaymentMethod;
-    public TableColumn<Double, Payment> colLateFee;
-    public TableColumn<String, Payment> colDate;
+    public TableColumn<String, PaymentDTO> colInvoice;
+    public TableColumn<String, PaymentDTO> colLoanId;
+    public TableColumn<String, PaymentDTO> colLoanType;
+    public TableColumn<Double, PaymentDTO> colAmount;
+    public TableColumn<String, PaymentDTO> colPaymentMethod;
+    public TableColumn<Double, PaymentDTO> colLateFee;
+    public TableColumn<String, PaymentDTO> colDate;
     public TextField txtNic;
-    public TableView<Payment> tblPaymentDetails;
+    public TableView<PaymentDTO> tblPaymentDetails;
     public AnchorPane rootNode;
+    PaymentBo paymentBo= (PaymentBo) BOFactory.getBoFactory().getBo(BOFactory.BoTypes.PAYMENT);
 
 
     public void initialize() {
+
         colInvoice.setCellValueFactory(new PropertyValueFactory<>("pInvoiceNo"));
         colLoanId.setCellValueFactory(new PropertyValueFactory<>("loanId"));
         colLoanType.setCellValueFactory(new PropertyValueFactory<>("loanType"));
@@ -47,13 +52,13 @@ public class PaymentDetailController {
     }
 
 
-    public void txtNicOnAction(ActionEvent event) {
+    public void txtNicOnAction(ActionEvent event) throws ClassNotFoundException {
         String nic = txtNic.getText();
         try {if (isValied()){
-            List<Payment> payments = PaymentRepo.getPaymentsByNIC(nic); // Assuming a method like this in PaymentRepo
-            if (payments != null) {
-                ObservableList<Payment> paymentList = FXCollections.observableArrayList(payments);
-                tblPaymentDetails.setItems(paymentList);
+            List<PaymentDTO> paymentDTOS = paymentBo.getPaymentsByNIC(nic); // Assuming a method like this in PaymentRepo
+            if (paymentDTOS != null) {
+                ObservableList<PaymentDTO> paymentDTOList = FXCollections.observableArrayList(paymentDTOS);
+                tblPaymentDetails.setItems(paymentDTOList);
             } } else {
                 tblPaymentDetails.getItems().clear();
             }
@@ -62,11 +67,11 @@ public class PaymentDetailController {
         }
     }
 
-    public void btnPrintBillOnAction(ActionEvent actionEvent) throws JRException, SQLException {
+    public void btnPrintBillOnAction(ActionEvent actionEvent) throws JRException, SQLException, ClassNotFoundException {
         String nic = txtNic.getText();
         try {
-            List<Payment> payments = PaymentRepo.getPaymentsByNIC(nic);
-            if (payments != null && !payments.isEmpty()) {
+            List<PaymentDTO> paymentDTOS = paymentBo.getPaymentsByNIC(nic);
+            if (paymentDTOS != null && !paymentDTOS.isEmpty()) {
                 Map<String, Object> parameters = new HashMap<>();
                 parameters.put("p_txtNic", nic);
 

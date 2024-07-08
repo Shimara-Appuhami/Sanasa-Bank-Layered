@@ -1,6 +1,5 @@
 package lk.ijse.gdse.controller;
 
-import com.ctc.wstx.shaded.msv_core.grammar.BinaryExp;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import javafx.collections.FXCollections;
@@ -8,7 +7,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -18,7 +16,10 @@ import javafx.stage.Stage;
 
 
 import lk.ijse.gdse.Util.Regex;
-import lk.ijse.gdse.model.Payment;
+import lk.ijse.gdse.bo.BOFactory;
+import lk.ijse.gdse.bo.custom.PaymentBo;
+import lk.ijse.gdse.model.PaymentDTO;
+import lk.ijse.gdse.model.tm.LoanTm;
 import lk.ijse.gdse.model.tm.PaymentTm;
 import lk.ijse.gdse.repository.*;
 
@@ -26,7 +27,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PaymentFormController {
@@ -46,25 +48,25 @@ public class PaymentFormController {
     private JFXButton btnBack;
 
     @FXML
-    private TableColumn<Payment, String> colAmount;
+    private TableColumn<PaymentDTO, String> colAmount;
 
     @FXML
-    private TableColumn<Payment, String> colDate;
+    private TableColumn<PaymentDTO, String> colDate;
 
     @FXML
-    private TableColumn<Payment, String> colInvoiceNo;
+    private TableColumn<PaymentDTO, String> colInvoiceNo;
 
     @FXML
-    private TableColumn<Payment, String> colLateFee;
+    private TableColumn<PaymentDTO, String> colLateFee;
 
     @FXML
-    private TableColumn<Payment, String> colLoanId;
+    private TableColumn<PaymentDTO, String> colLoanId;
 
     @FXML
-    private TableColumn<Payment, String> colPaymentMethod;
+    private TableColumn<PaymentDTO, String> colPaymentMethod;
 
     @FXML
-    private TableColumn<Payment, String> colRateId;
+    private TableColumn<PaymentDTO, String> colRateId;
 
 
     @FXML
@@ -87,7 +89,7 @@ public class PaymentFormController {
     @FXML
     private TableView<PaymentTm> tblPayment;
 
-
+    PaymentBo paymentBo= (PaymentBo) BOFactory.getBoFactory().getBo(BOFactory.BoTypes.PAYMENT);
 
     private void initializeComboBox() {
         ObservableList<String> paymentMethod = FXCollections.observableArrayList(
@@ -116,7 +118,7 @@ public class PaymentFormController {
     }
 
     private void clearFields() {
-        txtInvoiceNo.clear();
+        //txtInvoiceNo.clear();
         txtNic.clear();
         cmbLoanId.clear();
         cmbRateId.clear();
@@ -129,12 +131,13 @@ public class PaymentFormController {
 
     }
 
-    public void initialize() throws SQLException {
+    public void initialize() throws SQLException, ClassNotFoundException {
+        txtInvoiceNo.setText(generateNewId());
         initializeComboBoxLoanType();
         //handleCustomerIdEntered();
         //initializeComboBoxStatus();
         initializeComboBox();
-        lastPaymentId();
+
         setDate();
         setCellValueFactory();
         loadPayments();
@@ -155,22 +158,22 @@ public class PaymentFormController {
 
     }
 
-    private void loadPayments() {
+    private void loadPayments() throws ClassNotFoundException {
         ObservableList<PaymentTm> obList = FXCollections.observableArrayList();
 
         try {
-            List<Payment> paymentList = PaymentRepo.getAll();
-            for (Payment payment : paymentList) {
+            List<PaymentDTO> paymentDTOList = paymentBo.getAllPayments();
+            for (PaymentDTO paymentDTO : paymentDTOList) {
                 PaymentTm tm = new PaymentTm(
-                        payment.getPInvoiceNo(),
-                        payment.getNic(),
-                        payment.getLoanId(),
-                        payment.getRateId(),
-                        payment.getPaymentMethod(),
-                        payment.getPaymentAmount(),
-                        payment.getPaymentDate(),
-                        payment.getLoanType(),
-                        payment.getLateFee()
+                        paymentDTO.getPInvoiceNo(),
+                        paymentDTO.getNic(),
+                        paymentDTO.getLoanId(),
+                        paymentDTO.getRateId(),
+                        paymentDTO.getPaymentMethod(),
+                        paymentDTO.getPaymentAmount(),
+                        paymentDTO.getPaymentDate(),
+                        paymentDTO.getLoanType(),
+                        paymentDTO.getLateFee()
                 );
 
                 obList.add(tm);
@@ -183,7 +186,7 @@ public class PaymentFormController {
     }
 
     @FXML
-    void btnSaveOnAction(ActionEvent event) {
+    void btnSaveOnAction(ActionEvent event) throws ClassNotFoundException {
         try {
             String invoiceNo = txtInvoiceNo.getText();
             String nic = txtNic.getText();
@@ -195,9 +198,9 @@ public class PaymentFormController {
             String loanType = String.valueOf(cmbLoanType.getValue());
             String lateFee = txtLateFee.getText();
 
-            Payment payment = new Payment(invoiceNo, nic, loanId, rateId, paymentMethod, paymentAmount, paymentDate, loanType, lateFee);
+            PaymentDTO paymentDTO = new PaymentDTO(invoiceNo, nic, loanId, rateId, paymentMethod, paymentAmount, paymentDate, loanType, lateFee);
             if (isValied()) {
-                boolean isSaved = PaymentRepo.savePayment(payment);
+                boolean isSaved = paymentBo.savePayment(paymentDTO);
 
                 if (isSaved) {
                     new Alert(Alert.AlertType.CONFIRMATION, "Payment saved successfully").show();
@@ -214,7 +217,7 @@ public class PaymentFormController {
     }
 
     @FXML
-    void btnUpdateOnAction(ActionEvent event) {
+    void btnUpdateOnAction(ActionEvent event) throws ClassNotFoundException {
         try {
             String invoiceNo = txtInvoiceNo.getText();
             String nic = txtNic.getText();
@@ -226,9 +229,9 @@ public class PaymentFormController {
             String loanType = String.valueOf(cmbLoanType.getValue());
             String lateFee = txtLateFee.getText();
 
-            Payment payment = new Payment(invoiceNo, nic, loanId, rateId, paymentMethod, paymentAmount, paymentDate, loanType, lateFee);
+            PaymentDTO paymentDTO = new PaymentDTO(invoiceNo, nic, loanId, rateId, paymentMethod, paymentAmount, paymentDate, loanType, lateFee);
             if (isValied()) {
-                boolean isUpdated = PaymentRepo.update(payment);
+                boolean isUpdated = paymentBo.updatePayment(paymentDTO);
 
                 if (isUpdated) {
                     new Alert(Alert.AlertType.CONFIRMATION, "Payment updated successfully").show();
@@ -245,10 +248,10 @@ public class PaymentFormController {
     }
 
     @FXML
-    void btnDeleteOnAction(ActionEvent event) {
+    void btnDeleteOnAction(ActionEvent event) throws ClassNotFoundException {
         try {
             String invoiceNo = txtInvoiceNo.getText();
-            boolean isDeleted = PaymentRepo.delete(invoiceNo);
+            boolean isDeleted = paymentBo.deletePayment(invoiceNo);
 
             if (isDeleted) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Payment deleted successfully").show();
@@ -287,39 +290,37 @@ public class PaymentFormController {
     }
 
     @FXML
-    void txtSearchOnAction(ActionEvent event) throws SQLException {
+    void txtSearchOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         Regex.setTextColor(lk.ijse.gdse.Util.TextField.NIC, txtNic);
         String nic = txtNic.getText();
 
-        Payment payment = PaymentRepo.searchById(nic);
-        if (payment != null) {
-            txtInvoiceNo.setText(payment.getPInvoiceNo());
-            txtNic.setText(payment.getNic());
-            cmbLoanId.setText(payment.getLoanId());
-            cmbRateId.setText(payment.getRateId());
-            cmbPaymentMethod.setValue(payment.getPaymentMethod());
-            txtAmount.setText(payment.getPaymentAmount());
-            txtDate.setValue(LocalDate.parse(payment.getPaymentDate()));
-            cmbLoanType.setValue(payment.getLoanType());
+        PaymentDTO paymentDTO = paymentBo.searchByNic(nic);
+        if (paymentDTO != null) {
+            txtInvoiceNo.setText(paymentDTO.getPInvoiceNo());
+            txtNic.setText(paymentDTO.getNic());
+            cmbLoanId.setText(paymentDTO.getLoanId());
+            cmbRateId.setText(paymentDTO.getRateId());
+            cmbPaymentMethod.setValue(paymentDTO.getPaymentMethod());
+            txtAmount.setText(paymentDTO.getPaymentAmount());
+            txtDate.setValue(LocalDate.parse(paymentDTO.getPaymentDate()));
+            cmbLoanType.setValue(paymentDTO.getLoanType());
 
-            calculateLateFee(payment);
+            calculateLateFee(paymentDTO);
 
         } else {
-            cmbLoanType.setValue(null);
-            cmbRateId.setText("null");
-            cmbLoanId.setText("null");
+
             new Alert(Alert.AlertType.ERROR, "Loan details not found for NIC: " + nic).show();
         }
     }
 
-    private void calculateLateFee(Payment payment) {
+    private void calculateLateFee(PaymentDTO paymentDTO) throws ClassNotFoundException {
         LocalDate paymentDate = txtDate.getValue();
         String nic = txtNic.getText();
 
         try {
-            String loanId = PaymentRepo.getLoanIdByNIC(nic);
+            String loanId = paymentBo.getLoanIdByNIC(nic);
             if (loanId != null) {
-                LocalDate loanDate = PaymentRepo.getLoanDate(loanId);
+                LocalDate loanDate = paymentBo.getLoanDate(loanId);
 
                 if (paymentDate != null && loanDate != null) {
                     int monthsSinceLoan = calculateMonthsSinceLoan(loanDate, paymentDate);
@@ -375,32 +376,32 @@ public class PaymentFormController {
     public void txtPaymentMethodOnAction(ActionEvent event) {
     }
 
-    private void lastPaymentId() {
+    private String getLastCustomerId(){//limit quiry eken last eka gannawa
+        List<PaymentTm> tempCustomersList = new ArrayList<>(tblPayment.getItems());
+        Collections.sort(tempCustomersList);
+        return tempCustomersList.get(tempCustomersList.size() - 1).getP_invoice_no();
+    }
+
+    public String generateNewId() {
         try {
-            String lastId = PaymentRepo.getLastPaymentId();
-            String nextId = generateNextId(lastId);
-            txtInvoiceNo.setText(nextId);
+            //Generate New ID
+            return paymentBo.generateNewPaymentID();
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: " + e.getMessage());
+            new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-    }
 
-    private String generateNextId(String lastId) {
-        String nextId = null;
-        try {
-            if (lastId != null && !lastId.isEmpty()) {
-                int lastNumericId = Integer.parseInt(lastId.substring(1));
-                int nextNumericId = lastNumericId + 1;
-                nextId = String.format("P%03d", nextNumericId);
-            } else {
-                nextId = "P001";
-            }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: Invalid ID format");
+
+        if (tblPayment.getItems().isEmpty()) {
+            return "P001";
+        } else {
+            String id = getLastCustomerId();
+            int newCustomerId = Integer.parseInt(id.replace("P", "")) + 1;
+            return String.format("P%03d", newCustomerId);
         }
-        return nextId;
-    }
 
+    }
     private void showAlert(Alert.AlertType alertType, String message) {
         new Alert(alertType, message).show();
     }

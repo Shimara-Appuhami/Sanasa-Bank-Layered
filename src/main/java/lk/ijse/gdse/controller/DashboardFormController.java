@@ -201,6 +201,7 @@ void btnInquiryOnAction(ActionEvent event) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/view/balance-form.fxml"));
         this.node.getChildren().clear();
         this.node.getChildren().add(root);
+        System.out.println("login balance form");
     }
 
 

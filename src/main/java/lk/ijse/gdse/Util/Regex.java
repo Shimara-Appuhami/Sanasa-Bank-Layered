@@ -49,7 +49,7 @@ public class Regex {
                 break;
 
             case PERCENTAGE:
-                filed="^£?(([0-9]{1,3}(,\\d{3})*(\\.\\d{2})?)|(0\\.[0-9]\\d)|(00[0-9]))$";
+                filed="^-?(?:0|[1-9][0-9]*)\\.?[0-9]+$";
                 break;
             case TERM:
                 filed="^\\d+(?:\\.\\d+)?\\s*(?:years?|Y)$";

@@ -14,7 +14,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import lk.ijse.gdse.db.DbConnection;
-import lk.ijse.gdse.repository.InquiryRepo;
+
 import lk.ijse.gdse.repository.LoginRepo;
 
 import java.io.IOException;

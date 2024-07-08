@@ -4,6 +4,8 @@ import lk.ijse.gdse.dao.SQLUtil;
 import lk.ijse.gdse.dao.custom.CustomerDAO;
 import lk.ijse.gdse.entity.Customer;
 import lk.ijse.gdse.model.CustomerDTO;
+import lk.ijse.gdse.model.EmployeeDTO;
+import lk.ijse.gdse.model.tm.CustomerTm;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,10 +33,10 @@ public class CustomerDAOImpl implements CustomerDAO {
     }
 
     @Override
-    public CustomerDTO searchById(String cId) throws SQLException, ClassNotFoundException {
+    public Customer searchById(String cId) throws SQLException, ClassNotFoundException {
         ResultSet rst= SQLUtil.execute("SELECT * FROM customer WHERE c_id = ?");
         if(rst.next()){
-            return new CustomerDTO(rst.getString("cId"), rst.getString("cName"), rst.getString("cEmail"), rst.getString("cContact"), rst.getString("cAddress"), rst.getString("cAge"), rst.getString("dateOfBirth"), rst.getString("nic"), rst.getString("registrationDate"), rst.getString("annualIncome"));
+            return new Customer(rst.getString("cId"), rst.getString("cName"), rst.getString("cEmail"), rst.getString("cContact"), rst.getString("cAddress"), rst.getString("cAge"), rst.getString("dateOfBirth"), rst.getString("nic"), rst.getString("registrationDate"), rst.getString("annualIncome"));
         }
         return null;
 
@@ -66,23 +68,23 @@ public class CustomerDAOImpl implements CustomerDAO {
     }
 
     @Override
-    public CustomerDTO searchByNic(String nic) throws SQLException, ClassNotFoundException {
-        ResultSet rst = SQLUtil.execute("SELECT * FROM customer WHERE nic = ?",nic);
-        if (rst.next()) {
-            return new CustomerDTO(
-                    rst.getString("c_id"),
-                    rst.getString("c_name"),
-                    rst.getString("c_email"),
-                    rst.getString("c_contact"),
-                    rst.getString("c_address"),
-                    rst.getString("c_age"),
-                    rst.getString("date_of_birth"),
-                    rst.getString("nic"),
-                    rst.getString("registration_date"),
-                    rst.getString("annual_income")
-            );
-        }
-        return null;
+    public Customer searchByNic(String nic) throws SQLException, ClassNotFoundException {
+        ResultSet resultSet = SQLUtil.execute("SELECT * FROM customer WHERE nic=?", nic );
+        resultSet.next();
+        return new Customer(
+                resultSet.getString("cId"),
+                resultSet.getString("cName"),
+                resultSet.getString("cEmail"),
+                resultSet.getString("cContact"),
+                resultSet.getString("cAddress"),
+                resultSet.getString("cAge"),
+                resultSet.getString("dateOfBirth"),
+                resultSet.getString("nic"),
+                resultSet.getString("registrationDate"),
+                resultSet.getString("annualIncome")
+        );
     }
 
+
 }
+

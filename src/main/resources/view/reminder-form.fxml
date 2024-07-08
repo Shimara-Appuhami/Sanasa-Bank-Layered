@@ -71,7 +71,7 @@
             <Font name="Cambria" size="14.0" />
          </font>
       </Label>
-      <TextField fx:id="txtLoanType" layoutX="339.0" layoutY="402.0" onAction="#txtLoanTypeOnAction" promptText="loan type" />
+      <TextField fx:id="txtLoanType" layoutX="339.0" layoutY="402.0" onAction="#txtLoanTypeOnAction" promptText="loanDTO type" />
       <JFXButton buttonType="RAISED" layoutX="1050.0" layoutY="481.0" onAction="#btnSaveOnAction" prefHeight="33.0" prefWidth="75.0" style="-fx-background-color: #30336b; -fx-border-color: #30336b; -fx-text-fill: white;" text="Add">
          <font>
             <Font name="Cambria Bold Italic" size="15.0" />

@@ -59,9 +59,9 @@
          </font>
       </Label>
       <TextField fx:id="txtBalanceId" layoutX="592.0" layoutY="294.0" onAction="#txtBalanceIdOnAction" onKeyReleased="#txtBalanceIdOnKeyReleased" promptText="B0X" style="-fx-border-color: white;" />
-      <TextField fx:id="txtPrincipalBalance" layoutX="592.0" layoutY="408.0" onAction="#txtPrincipalBalanceOnAction" promptText="principal balance" style="-fx-border-color: white;" />
-      <TextField fx:id="txtInterestBalance" layoutX="592.0" layoutY="473.0" onAction="#txtInterestBalanceOnAction" promptText="interest balance" style="-fx-border-color: white;" />
-      <TextField fx:id="txtTotalBalance" layoutX="592.0" layoutY="538.0" onAction="#txtTotalBalanceOnAction" promptText="total balance " style="-fx-border-color: white;" />
+      <TextField fx:id="txtPrincipalBalance" layoutX="592.0" layoutY="408.0" onAction="#txtPrincipalBalanceOnAction" promptText="principal balanceDTO" style="-fx-border-color: white;" />
+      <TextField fx:id="txtInterestBalance" layoutX="592.0" layoutY="473.0" onAction="#txtInterestBalanceOnAction" promptText="interest balanceDTO" style="-fx-border-color: white;" />
+      <TextField fx:id="txtTotalBalance" layoutX="592.0" layoutY="538.0" onAction="#txtTotalBalanceOnAction" promptText="total balanceDTO " style="-fx-border-color: white;" />
 
       <Label layoutX="455.0" layoutY="607.0" prefHeight="30.0" prefWidth="118.0" text="Last Updated Date">
          <font>

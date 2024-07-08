@@ -13,10 +13,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lk.ijse.gdse.Util.Regex;
+import lk.ijse.gdse.bo.BOFactory;
+import lk.ijse.gdse.bo.custom.BalanceBo;
 import lk.ijse.gdse.db.DbConnection;
-import lk.ijse.gdse.model.Balance;
+import lk.ijse.gdse.model.BalanceDTO;
 import lk.ijse.gdse.model.tm.BalanceTm;
-import lk.ijse.gdse.repository.BalanceRepo;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
@@ -25,9 +26,7 @@ import net.sf.jasperreports.view.JasperViewer;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BalanceFormController {
 
@@ -42,16 +41,16 @@ public class BalanceFormController {
     public TextField txtLoanId;
     @FXML
 
-    private TableColumn<Balance, String> colPrincipalBalance;
+    private TableColumn<BalanceDTO, String> colPrincipalBalance;
 
     @FXML
-    private TableColumn<Balance, String> colInterestBalance;
+    private TableColumn<BalanceDTO, String> colInterestBalance;
 
     @FXML
-    private TableColumn<Balance, String> colTotalBalance;
+    private TableColumn<BalanceDTO, String> colTotalBalance;
 
     @FXML
-    private TableColumn<Balance, String> colLastUpdatedDate;
+    private TableColumn<BalanceDTO, String> colLastUpdatedDate;
 
     @FXML
     private TableView<BalanceTm> tblBalance;
@@ -65,7 +64,7 @@ public class BalanceFormController {
 
     @FXML
     private TextField txtTotalBalance;
-
+    BalanceBo balanceBo= (BalanceBo) BOFactory.getBoFactory().getBo(BOFactory.BoTypes.BALANCE);
 
     @FXML
     void btnClearOnAction(ActionEvent event) {
@@ -84,12 +83,12 @@ public class BalanceFormController {
     }
 
     @FXML
-    void btnDeleteOnAction(ActionEvent actionEvent) {
+    void btnDeleteOnAction(ActionEvent actionEvent) throws ClassNotFoundException {
         String bId = txtBalanceId.getText();
 
         if (!bId.isEmpty()) {
             try {
-                boolean isDeleted = BalanceRepo.delete(bId);
+                boolean isDeleted = balanceBo.deleteBalance(bId);
                 if (isDeleted) {
                     new Alert(Alert.AlertType.CONFIRMATION, "Balance deleted successfully!").show();
                     initialize();
@@ -106,7 +105,7 @@ public class BalanceFormController {
     }
 
     @FXML
-    void btnSaveOnAction(ActionEvent event) {
+    void btnSaveOnAction(ActionEvent event) throws ClassNotFoundException {
         String bId = txtBalanceId.getText();
         String principalBalance = txtPrincipalBalance.getText();
         String interestBalance = txtInterestBalance.getText();
@@ -114,11 +113,11 @@ public class BalanceFormController {
         String lastUpdatedDate = String.valueOf(txtLastUpdatedDate.getValue());
         String loanId=txtLoanId.getText();
 
-        Balance balance = new Balance(bId, loanId,principalBalance, interestBalance, totalBalance, lastUpdatedDate);
+        BalanceDTO balanceDTO = new BalanceDTO(bId, loanId,principalBalance, interestBalance, totalBalance, lastUpdatedDate);
 
         try {
             if (isValied()) {
-                boolean isSaved = BalanceRepo.save(balance);
+                boolean isSaved = balanceBo.saveBalance(balanceDTO);
                 if (isSaved) {
                     new Alert(Alert.AlertType.CONFIRMATION, "Balance saved successfully").show();
                     initialize();
@@ -133,7 +132,7 @@ public class BalanceFormController {
     }
 
     @FXML
-    void btnUpdateOnAction(ActionEvent event) {
+    void btnUpdateOnAction(ActionEvent event) throws ClassNotFoundException {
         String bId = txtBalanceId.getText();
 
         String principalBalance = txtPrincipalBalance.getText();
@@ -142,10 +141,10 @@ public class BalanceFormController {
         String lastUpdatedDate = String.valueOf(txtLastUpdatedDate.getValue());
         String loanId=txtLoanId.getText();
 
-        Balance balance = new Balance(bId, loanId,principalBalance, interestBalance, totalBalance, lastUpdatedDate);
+        BalanceDTO balanceDTO = new BalanceDTO(bId, loanId,principalBalance, interestBalance, totalBalance, lastUpdatedDate);
         try {
             if (isValied()) {
-                boolean isUpdated = BalanceRepo.update(balance);
+                boolean isUpdated = balanceBo.updateBalance(balanceDTO);
 
                 if (isUpdated) {
                     new Alert(Alert.AlertType.CONFIRMATION, "Balance updated").show();
@@ -161,28 +160,28 @@ public class BalanceFormController {
     }
 
     @FXML
-    void txtSearchOnAction(ActionEvent event) throws SQLException {
+    void txtSearchOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         Regex.setTextColor(lk.ijse.gdse.Util.TextField.NIC, txtNic);
         String nic = txtNic.getText();
 
-        try {
-            BalanceTm balance = BalanceRepo.searchById(nic);
+
+            BalanceDTO balance = balanceBo.searchByNicBalance(nic);
             if (balance != null) {
                 // calculateBalances();
-                txtBalanceId.setText(balance.getB_id());
-                //  txtNic.setText(balance.getNic());
-                txtPrincipalBalance.setText(balance.getPrincipal_balance());
-                txtInterestBalance.setText(balance.getInterest_balance());
-                txtTotalBalance.setText(balance.getTotal_balance());
-                txtLastUpdatedDate.setValue(LocalDate.parse(balance.getLast_updated_date()));
-                txtLoanId.setText(balance.getLoan_id());
+                txtBalanceId.setText(balance.getBId());
+                //txtNic.setText(balance.getNic());
+                txtPrincipalBalance.setText(balance.getPrincipalBalance());
+                txtInterestBalance.setText(balance.getInterestBalance());
+                txtTotalBalance.setText(balance.getTotalBalance());
+                txtLastUpdatedDate.setValue(LocalDate.parse(balance.getLastUpdatedDate()));
+                txtLoanId.setText(balance.getLoanId());
 
             } else {
-                String amount = BalanceRepo.getAmount(nic);
-                String payBalance=BalanceRepo.getPayBalance(nic);
-                String totalBalance=BalanceRepo.getTotalBalance(nic);
-                String lastUpdatedDate=BalanceRepo.getLastPaymentDate(nic);
-                String loanId=BalanceRepo.getLoanId(nic);
+                String amount = balanceBo.getAmount(nic);
+                String payBalance=balanceBo.getPayBalance(nic);
+                String totalBalance=balanceBo.getTotalBalance(nic);
+                String lastUpdatedDate=balanceBo.getLastPaymentDate(nic);
+                String loanId=balanceBo.getLoanId(nic);
                 if (balance==null) {
                     txtPrincipalBalance.setText(amount);
                     txtInterestBalance.setText(payBalance);
@@ -194,16 +193,15 @@ public class BalanceFormController {
                     new Alert(Alert.AlertType.ERROR, "balance not found for NIC: " + nic).show();
                 }
 
-            }
-        } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR, "Error searching Balance: " + e.getMessage()).show();
+
         }
     }
 
-    public void initialize() throws SQLException {
-        lastBalanceId();
+    public void initialize() throws SQLException, ClassNotFoundException {
+        generateNewId();
         setCellValueFactory();
         loadAllBalances();
+        txtBalanceId.setText(generateNewId());
     }
 
     public void setCellValueFactory() throws SQLException {
@@ -215,19 +213,19 @@ public class BalanceFormController {
         colLastUpdatedDate.setCellValueFactory(new PropertyValueFactory<>("last_updated_date"));
     }
 
-    private void loadAllBalances() {
+    private void loadAllBalances() throws ClassNotFoundException {
         ObservableList<BalanceTm> obList = FXCollections.observableArrayList();
 
         try {
-            List<BalanceTm> balanceList = BalanceRepo.getAll();
-            for (BalanceTm balance : balanceList) {
+            List<BalanceDTO> balanceList = balanceBo.getAllBalances();
+            for (BalanceDTO balance : balanceList) {
                 BalanceTm tm = new BalanceTm(
-                        balance.getB_id(),
-                        balance.getLoan_id(),
-                        balance.getPrincipal_balance(),
-                        balance.getInterest_balance(),
-                        balance.getTotal_balance(),
-                        balance.getLast_updated_date()
+                        balance.getBId(),
+                        balance.getLoanId(),
+                        balance.getPrincipalBalance(),
+                        balance.getInterestBalance(),
+                        balance.getTotalBalance(),
+                        balance.getLastUpdatedDate()
                 );
                 obList.add(tm);
             }
@@ -260,32 +258,32 @@ public class BalanceFormController {
     public void txtTotalBalanceOnAction(ActionEvent event) {
     }
 
-    private void lastBalanceId() {
+    private String getLastCustomerId(){//limit quiry eken last eka gannawa
+        List<BalanceTm> tempCustomersList = new ArrayList<>(tblBalance.getItems());
+        Collections.sort(tempCustomersList);
+        return tempCustomersList.get(tempCustomersList.size() - 1).getB_id();
+    }
+
+    private String generateNewId() {
         try {
-            String lastId = BalanceRepo.getLastBalanceId();
-            String nextId = generateNextId(lastId);
-            txtBalanceId.setText(nextId);
+            //Generate New ID
+            return balanceBo.generateNewBalanceId();
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: " + e.getMessage());
+            new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-    }
 
-    private String generateNextId(String lastId) {
-        String nextId = null;
-        try {
-            if (lastId != null && !lastId.isEmpty()) {
-                int lastNumericId = Integer.parseInt(lastId.substring(1));
-                int nextNumericId = lastNumericId + 1;
-                nextId = String.format("B%03d", nextNumericId);
-            } else {
-                nextId = "B001";
-            }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: Invalid ID format");
+
+        if (tblBalance.getItems().isEmpty()) {
+            return "B001";
+        } else {
+            String id = getLastCustomerId();
+            int newCustomerId = Integer.parseInt(id.replace("B", "")) + 1;
+            return String.format("B%03d", newCustomerId);
         }
-        return nextId;
-    }
 
+    }
     private void showAlert(Alert.AlertType alertType, String message) {
         new Alert(alertType, message).show();
     }

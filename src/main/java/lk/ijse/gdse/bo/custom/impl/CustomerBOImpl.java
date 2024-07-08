@@ -3,7 +3,9 @@ package lk.ijse.gdse.bo.custom.impl;
 import lk.ijse.gdse.bo.custom.CustomerBo;
 import lk.ijse.gdse.dao.DAOFactory;
 import lk.ijse.gdse.dao.custom.CustomerDAO;
+import lk.ijse.gdse.entity.Balance;
 import lk.ijse.gdse.entity.Customer;
+import lk.ijse.gdse.model.BalanceDTO;
 import lk.ijse.gdse.model.CustomerDTO;
 
 import java.sql.SQLException;
@@ -13,19 +15,19 @@ import java.util.List;
 public class CustomerBOImpl implements CustomerBo {
     CustomerDAO customerDAO= (CustomerDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.CUSTOMER);
 
-    public  boolean saveCustomer(CustomerDTO dto) throws SQLException, ClassNotFoundException{
+    public boolean saveCustomer(CustomerDTO dto) throws SQLException, ClassNotFoundException{
         return customerDAO.save(new Customer(dto.getCId(), dto.getCName(), dto.getCEmail(), dto.getCContact(), dto.getCAddress(), dto.getCAge(), dto.getDateOfBirth(), dto.getNic(), dto.getRegistrationDate(), dto.getAnnualIncome()));
     }
-    public  boolean updateCustomer(CustomerDTO dto) throws SQLException, ClassNotFoundException{
+    public boolean updateCustomer(CustomerDTO dto) throws SQLException, ClassNotFoundException{
         return customerDAO.update(new Customer(dto.getCId(), dto.getCName(), dto.getCEmail(), dto.getCContact(), dto.getCAddress(), dto.getCAge(), dto.getDateOfBirth(), dto.getNic(), dto.getRegistrationDate(), dto.getAnnualIncome()));
     }
 
-    public  boolean deleteCustomer(String id) throws SQLException, ClassNotFoundException{
+    public boolean deleteCustomer(String id) throws SQLException, ClassNotFoundException{
         return customerDAO.delete(id);
     }
 
-    public CustomerDTO searchById(String id) throws SQLException, ClassNotFoundException{
-        return customerDAO.searchById(id);
+    public CustomerDTO searchByIdCustomer(String id) throws SQLException, ClassNotFoundException{
+        return null;
     }
 
     public List<CustomerDTO> getAllCustomers() throws SQLException, ClassNotFoundException{
@@ -38,12 +40,16 @@ public class CustomerBOImpl implements CustomerBo {
         return customerDTOS;
     }
 
-    public  String generateNewCustomerID() throws SQLException, ClassNotFoundException{
+    public String generateNewCustomerID() throws SQLException, ClassNotFoundException{
         return customerDAO.generateNewID();
     }
 
     public CustomerDTO searchByNicCustomer(String nic) throws SQLException, ClassNotFoundException {
-        return customerDAO.searchByNic(nic);
+        Customer customer = customerDAO.searchById(nic);
+        if (customer != null) {
+            return new CustomerDTO(nic);
+        }
+        return null;
     }
 
 }

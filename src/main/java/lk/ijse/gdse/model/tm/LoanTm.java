@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoanTm {
+public class LoanTm  implements Comparable<LoanTm>{
     private String loan_id;
     private String application;
     private String loan_amount;
@@ -25,4 +25,10 @@ public class LoanTm {
 
     public LoanTm(double percentage) {
     }
+    @Override
+    public int compareTo(LoanTm o) {
+        return loan_id.compareTo(o.getLoan_id());
+    }
+
+
 }

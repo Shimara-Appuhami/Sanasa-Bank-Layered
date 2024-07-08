@@ -14,10 +14,13 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import lk.ijse.gdse.Util.Regex;
+import lk.ijse.gdse.bo.BOFactory;
+import lk.ijse.gdse.bo.custom.InquiryBo;
 import lk.ijse.gdse.db.DbConnection;
-import lk.ijse.gdse.model.Inquiry;
+import lk.ijse.gdse.model.InquiryDTO;
+import lk.ijse.gdse.model.tm.CustomerTm;
 import lk.ijse.gdse.model.tm.InquiryTm;
-import lk.ijse.gdse.repository.InquiryRepo;
+
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
@@ -26,6 +29,8 @@ import net.sf.jasperreports.view.JasperViewer;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class InquiryFormController {
@@ -42,16 +47,16 @@ public class InquiryFormController {
     public Rectangle imgPhoto;
     public JFXButton btnClear;
     @FXML
-    private TableColumn<Inquiry, String> colInquiryDate;
+    private TableColumn<InquiryDTO, String> colInquiryDate;
 
     @FXML
-    private TableColumn<Inquiry, String> colInquiryId;
+    private TableColumn<InquiryDTO, String> colInquiryId;
 
     @FXML
-    private TableColumn<Inquiry, String> colInquiryType;
+    private TableColumn<InquiryDTO, String> colInquiryType;
 
     @FXML
-    private TableColumn<Inquiry, String> colResponseDate;
+    private TableColumn<InquiryDTO, String> colResponseDate;
 
     @FXML
     private TableView<InquiryTm> tblInquiry;
@@ -64,6 +69,7 @@ public class InquiryFormController {
 
     @FXML
     private TextField txtType;
+    InquiryBo inquiryBo= (InquiryBo) BOFactory.getBoFactory().getBo(BOFactory.BoTypes.INQUIRY);
     @FXML
     void btnClearOnAction(ActionEvent event) {
         clearFields();
@@ -82,12 +88,12 @@ public class InquiryFormController {
     }
 
     @FXML
-    void btnDeleteOnAction(ActionEvent actionEvent) {
+    void btnDeleteOnAction(ActionEvent actionEvent) throws ClassNotFoundException {
         String inquiryId = txtInquiryId.getText();
 
         if (!inquiryId.isEmpty()) {
             try {
-                boolean isDeleted = InquiryRepo.delete(inquiryId);
+                boolean isDeleted = inquiryBo.deleteInquiry(inquiryId);
                 if (isDeleted) {
                     new Alert(Alert.AlertType.CONFIRMATION, "Inquiry deleted successfully!").show();
                     initialize();
@@ -105,7 +111,7 @@ public class InquiryFormController {
 
 
     @FXML
-    void btnSaveOnAction(ActionEvent event) {
+    void btnSaveOnAction(ActionEvent event) throws ClassNotFoundException {
         String inquiryId = txtInquiryId.getText();
         String nic = txtNic.getText();
         String customerId = txtCustomerId.getText();
@@ -115,16 +121,16 @@ public class InquiryFormController {
 
 
 
-        Inquiry inquiry = new Inquiry(inquiryId, nic, customerId, inquiryType,inquiryDate,responseDate);
+        InquiryDTO inquiryDTO = new InquiryDTO(inquiryId, nic, customerId, inquiryType,inquiryDate,responseDate);
 
 
-        try {if (isValied()){
-            boolean isSaved = InquiryRepo.save(inquiry);
+        try {
+            boolean isSaved = inquiryBo.saveInquiry(inquiryDTO);
             if (isSaved) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Inquiry saved successfully").show();
                 initialize();
                 clearFields();
-            }
+
             } else {
                 new Alert(Alert.AlertType.WARNING, "Inquiry saving failed").show();
             }
@@ -135,7 +141,7 @@ public class InquiryFormController {
 
 
     @FXML
-    void btnUpdateOnAction(ActionEvent event) {
+    void btnUpdateOnAction(ActionEvent event) throws ClassNotFoundException {
         String inquiryId = txtInquiryId.getText();
         String nic = txtNic.getText();
         String customerId = txtCustomerId.getText();
@@ -145,10 +151,10 @@ public class InquiryFormController {
 
 
 
-        Inquiry inquiry = new Inquiry(inquiryId, nic, customerId, inquiryType,inquiryDate,responseDate);
+        InquiryDTO inquiryDTO = new InquiryDTO(inquiryId, nic, customerId, inquiryType,inquiryDate,responseDate);
 
         try {if (isValied()){
-            boolean isUpdated = InquiryRepo.update(inquiry);
+            boolean isUpdated = inquiryBo.updateInquiry(inquiryDTO);
 
             if (isUpdated) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Inquiry updated").show();
@@ -163,21 +169,21 @@ public class InquiryFormController {
         }
     }
     @FXML
-    void txtSearchOnAction(ActionEvent event) throws SQLException {
+    void txtSearchOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         String id = txtNic.getText();
 
         try {
-            Inquiry inquiry  = InquiryRepo.searchById(id);
-            if (inquiry != null ) {
-                txtInquiryId.setText(inquiry.getInId());
-                txtCustomerId.setText(inquiry.getCId());
-                txtType.setText(inquiry.getInType());
-                txtInquiryDate.setText(inquiry.getInDate());
-                txtResponseDate.setValue(LocalDate.parse(inquiry.getResponseDate()));
+            InquiryDTO inquiryDTO = inquiryBo.searchByIdInquiry(id);
+            if (inquiryDTO != null ) {
+                txtInquiryId.setText(inquiryDTO.getInId());
+                txtCustomerId.setText(inquiryDTO.getCId());
+                txtType.setText(inquiryDTO.getInType());
+                txtInquiryDate.setText(inquiryDTO.getInDate());
+                txtResponseDate.setValue(LocalDate.parse(inquiryDTO.getResponseDate()));
 
             } else {
-                String customerId = InquiryRepo.getCustId(id);
-                if (inquiry != null) {
+                String customerId = String.valueOf(inquiryBo.searchByNicInquiry(id));
+                if (inquiryDTO != null) {
                     txtCustomerId.setText(customerId);
                    // new Alert(Alert.AlertType.INFORMATION, "Your Customer ID is ");
                 } else {
@@ -206,12 +212,13 @@ public class InquiryFormController {
     void txtTypeOnAction(ActionEvent event) {
 
     }
-    public void initialize() throws SQLException {
+    public void initialize() throws SQLException, ClassNotFoundException {
         handleCustomerIdEntered();
-        lastInquiryId();
+        generateNewId();
         setDate();
         setCellValueFactory();
         loadAllCustomers();
+        txtInquiryId.setText(generateNewId());
     }
     @FXML
 
@@ -224,19 +231,19 @@ public class InquiryFormController {
         colResponseDate.setCellValueFactory(new PropertyValueFactory<>("response_date"));
     }
 
-    private void loadAllCustomers() {
+    private void loadAllCustomers() throws ClassNotFoundException {
         ObservableList<InquiryTm> obList = FXCollections.observableArrayList();
 
         try {
-            List<Inquiry> inquiryList = InquiryRepo.getAll();
-            for (Inquiry inquiry : inquiryList) {
+            List<InquiryDTO> inquiryDTOList = inquiryBo.getAllInquiries();
+            for (InquiryDTO inquiryDTO : inquiryDTOList) {
                 InquiryTm tm = new InquiryTm(
-                        inquiry.getInId(),
-                        inquiry.getNic(),
-                        inquiry.getCId(),
-                        inquiry.getInType(),
-                        inquiry.getInDate(),
-                        inquiry.getResponseDate()
+                        inquiryDTO.getInId(),
+                        inquiryDTO.getNic(),
+                        inquiryDTO.getCId(),
+                        inquiryDTO.getInType(),
+                        inquiryDTO.getInDate(),
+                        inquiryDTO.getResponseDate()
                 );
 
                 obList.add(tm);
@@ -258,30 +265,31 @@ public class InquiryFormController {
         stage.centerOnScreen();
         stage.setTitle("Dashboard Form");
     }
-    private void lastInquiryId() {
-        try {
-            String lastId = InquiryRepo.getLastInquiryId();
-            String nextId = generateNextId(lastId);
-            txtInquiryId.setText(nextId);
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: " + e.getMessage());
-        }
+    private String getLastCustomerId(){//limit quiry eken last eka gannawa
+        List<InquiryTm> tempCustomersList = new ArrayList<>(tblInquiry.getItems());
+        Collections.sort(tempCustomersList);
+        return tempCustomersList.get(tempCustomersList.size() - 1).getIn_id();
     }
 
-    private String generateNextId(String lastId) {
-        String nextId = null;
+    private String generateNewId() {
         try {
-            if (lastId != null && !lastId.isEmpty()) {
-                int lastNumericId = Integer.parseInt(lastId.substring(1));
-                int nextNumericId = lastNumericId + 1;
-                nextId = String.format("I%03d", nextNumericId);
-            } else {
-                nextId = "I001";
-            }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: Invalid ID format");
+            //Generate New ID
+            return inquiryBo.generateNewInquiryID();
+        } catch (SQLException e) {
+            new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return nextId;
+
+
+        if (tblInquiry.getItems().isEmpty()) {
+            return "I001";
+        } else {
+            String id = getLastCustomerId();
+            int newCustomerId = Integer.parseInt(id.replace("I", "")) + 1;
+            return String.format("I%03d", newCustomerId);
+        }
+
     }
 
     private void showAlert(Alert.AlertType alertType, String message) {
@@ -298,11 +306,11 @@ public class InquiryFormController {
 
     public void txtInquiryIdOnAction(ActionEvent event) {
     }
-    private void handleCustomerIdEntered() {
+    private void handleCustomerIdEntered() throws ClassNotFoundException {
         try {
             String nic = txtNic.getText();
             if (!nic.isEmpty()) {
-                String id = InquiryRepo.searching(nic);
+                String id = String.valueOf(inquiryBo.searchByNicInquiry(nic));
                 txtCustomerId.setText(id);
 
             } else {

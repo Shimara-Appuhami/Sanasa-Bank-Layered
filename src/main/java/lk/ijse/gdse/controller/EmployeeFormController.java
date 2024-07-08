@@ -16,11 +16,16 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lk.ijse.gdse.Util.Regex;
-import lk.ijse.gdse.model.Employee;
+import lk.ijse.gdse.bo.BOFactory;
+import lk.ijse.gdse.bo.custom.EmployeeBo;
+import lk.ijse.gdse.model.EmployeeDTO;
+import lk.ijse.gdse.model.tm.CustomerTm;
 import lk.ijse.gdse.model.tm.EmployeeTm;
-import lk.ijse.gdse.repository.EmployeeRepo;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -31,22 +36,22 @@ public class EmployeeFormController {
     public TextField txtPosition;
 
     @FXML
-    private TableColumn<Employee, String> colAddress;
+    private TableColumn<EmployeeDTO, String> colAddress;
 
     @FXML
-    private TableColumn<Employee, String> colContact;
+    private TableColumn<EmployeeDTO, String> colContact;
 
     @FXML
-    private TableColumn<Employee, String> colId;
+    private TableColumn<EmployeeDTO, String> colId;
 
     @FXML
-    private TableColumn<Employee, String> colPosition;
+    private TableColumn<EmployeeDTO, String> colPosition;
 
     @FXML
-    private TableColumn<Employee, String> colName;
+    private TableColumn<EmployeeDTO, String> colName;
 
     @FXML
-    private TableColumn<Employee, String> colSalary;
+    private TableColumn<EmployeeDTO, String> colSalary;
 
     @FXML
     private TableView<EmployeeTm> tblEmployee;
@@ -66,12 +71,14 @@ public class EmployeeFormController {
 
     @FXML
     private TextField txtSalary;
-
+    EmployeeBo employeeBo= (EmployeeBo) BOFactory.getBoFactory().getBo(BOFactory.BoTypes.EMPLOYEE);
     @FXML
-    void initialize() throws SQLException {
-        lastEmployeeId();
+    void initialize() throws SQLException, ClassNotFoundException {
+        generateNewId();
         setCellValueFactories();
         loadEmployees();
+        txtEmployeeId.setText(generateNewId());
+        addTableSelectionListener();
 
     }
 
@@ -84,19 +91,19 @@ public class EmployeeFormController {
         colPosition.setCellValueFactory(new PropertyValueFactory<>("position"));
     }
 
-    private void loadEmployees() throws SQLException {
+    private void loadEmployees() throws SQLException, ClassNotFoundException {
         ObservableList<EmployeeTm> obList = FXCollections.observableArrayList();
 
         try {
-            List<Employee> employeeList = EmployeeRepo.getAll();
-            for (Employee employee : employeeList) {
+            List<EmployeeDTO> employeeDTOList = employeeBo.getAllEmployees();
+            for (EmployeeDTO employeeDTO : employeeDTOList) {
                 EmployeeTm tm = new EmployeeTm(
-                        employee.getEmployeeId(),
-                        employee.getEmployeeName(),
-                        employee.getEmployeeContact(),
-                        employee.getEmployeeAddress(),
-                        employee.getEmployeeSalary(),
-                        employee.getPosition()
+                        employeeDTO.getEmployeeId(),
+                        employeeDTO.getEmployeeName(),
+                        employeeDTO.getEmployeeContact(),
+                        employeeDTO.getEmployeeAddress(),
+                        employeeDTO.getEmployeeSalary(),
+                        employeeDTO.getPosition()
 
                 );
 
@@ -108,9 +115,22 @@ public class EmployeeFormController {
             throw new RuntimeException(e);
         }
     }
+    private void addTableSelectionListener() {
+        tblEmployee.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                EmployeeTm selectedEmployee = newValue;
+                txtEmployeeId.setText(selectedEmployee.getE_id());
+                txtName.setText(selectedEmployee.getE_name());
+                txtAddress.setText(selectedEmployee.getE_address());
+                txtContact.setText(selectedEmployee.getE_contact());
+                txtSalary.setText(selectedEmployee.getE_salary());
+                txtPosition.setText(selectedEmployee.getPosition());
 
+            }
+        });
+    }
     @FXML
-    void btnSaveOnAction(ActionEvent event) {
+    void btnSaveOnAction(ActionEvent event) throws ClassNotFoundException {
         String eId = txtEmployeeId.getText();
         String eName = txtName.getText();
         String eContact = txtContact.getText();
@@ -118,9 +138,9 @@ public class EmployeeFormController {
         String eSalary = txtSalary.getText();
         String position = txtPosition.getText();
 
-        Employee employee = new Employee(eId, eName, eContact, eAddress, eSalary, position);
+        EmployeeDTO employeeDTO = new EmployeeDTO(eId, eName, eContact, eAddress, eSalary, position);
         try {if (isValied()){
-            boolean isSaved = EmployeeRepo.save(employee);
+            boolean isSaved = employeeBo.saveEmployee(employeeDTO);
             if (isSaved) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Employee saved successfully").show();
                 initialize();
@@ -136,7 +156,7 @@ public class EmployeeFormController {
     }
 
     @FXML
-    void btnUpdateOnAction(ActionEvent event) {
+    void btnUpdateOnAction(ActionEvent event) throws ClassNotFoundException {
         String eId = txtEmployeeId.getText();
         String eName = txtName.getText();
         String eContact = txtContact.getText();
@@ -144,9 +164,9 @@ public class EmployeeFormController {
         String eSalary = txtSalary.getText();
         String position = txtPosition.getText();
 
-        Employee employee = new Employee(eId, eName, eContact, eAddress, eSalary, position);
+        EmployeeDTO employeeDTO = new EmployeeDTO(eId, eName, eContact, eAddress, eSalary, position);
         try {if (isValied()){
-            boolean isUpdated = EmployeeRepo.update(employee);
+            boolean isUpdated = employeeBo.updateEmployee(employeeDTO);
             if (isUpdated) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Employee updated successfully").show();
 
@@ -163,10 +183,10 @@ public class EmployeeFormController {
     }
 
     @FXML
-    void btnDeleteOnAction(ActionEvent event) {
+    void btnDeleteOnAction(ActionEvent event) throws ClassNotFoundException {
         String eId = txtEmployeeId.getText();
         try {
-            boolean isDeleted = EmployeeRepo.delete(eId);
+            boolean isDeleted = employeeBo.deleteEmployee(eId);
             if (isDeleted) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Employee deleted successfully").show();
                 initialize();
@@ -194,25 +214,25 @@ public class EmployeeFormController {
     }
 
     @FXML
-    void txtSearchOnAction(ActionEvent event) throws SQLException {
+    void txtSearchOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         String id = txtEmployeeId.getText();
 
         try {
-            Employee employee = EmployeeRepo.searchById(id);
-            setEmployeeData(employee);
+            EmployeeDTO employeeDTO = employeeBo.searchByIdEmployee(id);
+            setEmployeeData(employeeDTO);
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Error searching Employee: " + e.getMessage()).show();
         }
     }
 
-    private void setEmployeeData(Employee employee) {
-        if (employee != null) {
-            txtEmployeeId.setText(employee.getEmployeeId());
-            txtName.setText(employee.getEmployeeName());
-            txtContact.setText(employee.getEmployeeContact());
-            txtAddress.setText(employee.getEmployeeAddress());
-            txtSalary.setText(employee.getEmployeeSalary());
-            txtPosition.setText(employee.getPosition());
+    private void setEmployeeData(EmployeeDTO employeeDTO) {
+        if (employeeDTO != null) {
+            txtEmployeeId.setText(employeeDTO.getEmployeeId());
+            txtName.setText(employeeDTO.getEmployeeName());
+            txtContact.setText(employeeDTO.getEmployeeContact());
+            txtAddress.setText(employeeDTO.getEmployeeAddress());
+            txtSalary.setText(employeeDTO.getEmployeeSalary());
+            txtPosition.setText(employeeDTO.getPosition());
         } else {
             System.out.println("Employee data is null.");
         }
@@ -243,30 +263,31 @@ public class EmployeeFormController {
         stage.setTitle("Dashboard Form");
     }
 
-    private void lastEmployeeId() {
-        try {
-            String lastId = EmployeeRepo.getLastEmployeeId();
-            String nextId = generateNextId(lastId);
-            txtEmployeeId.setText(nextId);
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: " + e.getMessage());
-        }
+    private String getLastCustomerId(){//limit quiry eken last eka gannawa
+        List<EmployeeTm> tempCustomersList = new ArrayList<>(tblEmployee.getItems());
+        Collections.sort(tempCustomersList);
+        return tempCustomersList.get(tempCustomersList.size() - 1).getE_id();
     }
 
-    private String generateNextId(String lastId) {
-        String nextId = null;
+    private String generateNewId() {
         try {
-            if (lastId != null && !lastId.isEmpty()) {
-                int lastNumericId = Integer.parseInt(lastId.substring(1));
-                int nextNumericId = lastNumericId + 1;
-                nextId = String.format("E%03d", nextNumericId);
-            } else {
-                nextId = "E001";
-            }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: Invalid ID format");
+            //Generate New ID
+            return employeeBo.generateNewEmployeeID();
+        } catch (SQLException e) {
+            new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return nextId;
+
+
+        if (tblEmployee.getItems().isEmpty()) {
+            return "E001";
+        } else {
+            String id = getLastCustomerId();
+            int newCustomerId = Integer.parseInt(id.replace("E", "")) + 1;
+            return String.format("E%03d", newCustomerId);
+        }
+
     }
 
     private void showAlert(Alert.AlertType alertType, String message) {

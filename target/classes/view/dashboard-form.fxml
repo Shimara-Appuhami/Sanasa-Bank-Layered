@@ -73,26 +73,10 @@
                   <Image url="@../image/icons8-management-50.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="30.0" fitWidth="32.0" layoutX="35.0" layoutY="569.0">
-               <image>
-                  <Image url="@../image/icons8-payment-100.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="24.0" fitWidth="25.0" layoutX="34.0" layoutY="754.0" opacity="0.64">
-               <image>
-                  <Image url="@../image/icons8-balance-64.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="24.0" fitWidth="25.0" layoutX="33.0" layoutY="696.0" opacity="0.59">
-               <image>
-                  <Image url="@../image/icons8-reminder-50.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="30.0" fitWidth="25.0" layoutX="35.0" layoutY="323.0" opacity="0.73">
-               <image>
-                  <Image url="@../image/icons8-inquiry-50.png" />
-               </image>
-            </ImageView>
+
+
+
+
             <JFXButton fx:id="btnAccount" alignment="TOP_RIGHT" buttonType="RAISED" layoutX="23.0" layoutY="629.0" onAction="#btnAccountOnAction" prefHeight="40.0" prefWidth="198.0" text="Create Account" textFill="WHITE">
                <font>
                   <Font name="Britannic Bold" size="16.0" />

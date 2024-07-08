@@ -15,9 +15,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lk.ijse.gdse.Util.Regex;
-import lk.ijse.gdse.model.Reminder;
+import lk.ijse.gdse.bo.BOFactory;
+import lk.ijse.gdse.bo.custom.ReminderBo;
+import lk.ijse.gdse.model.ReminderDTO;
+import lk.ijse.gdse.model.tm.PaymentTm;
 import lk.ijse.gdse.model.tm.ReminderTm;
-import lk.ijse.gdse.repository.ReminderRepo;
+
 
 import java.awt.*;
 import java.io.IOException;
@@ -26,6 +29,8 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ReminderFormController {
@@ -43,22 +48,22 @@ public class ReminderFormController {
     private JFXButton btnBack;
 
     @FXML
-    private TableColumn<Reminder, String> colDate;
+    private TableColumn<ReminderDTO, String> colDate;
 
     @FXML
-    private TableColumn<Reminder, String> colInvoiceNo;
+    private TableColumn<ReminderDTO, String> colInvoiceNo;
 
     @FXML
-    private TableColumn<Reminder, String> colMessage;
+    private TableColumn<ReminderDTO, String> colMessage;
 
     @FXML
-    private TableColumn<Reminder, String> colReminderId;
+    private TableColumn<ReminderDTO, String> colReminderId;
 
     @FXML
-    private TableColumn<Reminder, String> colStatus;
+    private TableColumn<ReminderDTO, String> colStatus;
 
     @FXML
-    private TableColumn<Reminder, String> colType;
+    private TableColumn<ReminderDTO, String> colType;
 
     @FXML
     private TableView<ReminderTm> tblReminder;
@@ -68,6 +73,7 @@ public class ReminderFormController {
 
     @FXML
     private TextField txtReminderId;
+    ReminderBo reminderBo= (ReminderBo) BOFactory.getBoFactory().getBo(BOFactory.BoTypes.REMINDER);
 
 
     private void initializeComboBoxType() {
@@ -87,14 +93,15 @@ public class ReminderFormController {
         cmbStatus.setItems(status);
     }
     @FXML
-    void initialize() {
+    void initialize() throws ClassNotFoundException {
         initializeComboBoxStatus();
         initializeComboBoxType();
         //getPaymentIds();
-        lastReminderId();
+        generateNewId();
         setDate();
         setCellValueFactory();
         loadAllReminders();
+        txtReminderId.setText(generateNewId());
     }
 
     private void setCellValueFactory() {
@@ -110,20 +117,20 @@ public class ReminderFormController {
 
     }
 
-    private void loadAllReminders() {
+    private void loadAllReminders() throws ClassNotFoundException {
         ObservableList<ReminderTm> obList = FXCollections.observableArrayList();
 
         try {
-            List<Reminder> reminderList = ReminderRepo.getAll();
-            for (Reminder reminder : reminderList) {
+            List<ReminderDTO> reminderDTOList = reminderBo.getAllReminders();
+            for (ReminderDTO reminderDTO : reminderDTOList) {
                 ReminderTm tm = new ReminderTm(
-                        reminder.getRId(),
-                        reminder.getNic(),
-                        reminder.getLoanType(),
-                        reminder.getRMessage(),
-                        reminder.getRType(),
-                        reminder.getRDate(),
-                        reminder.getRStatus()
+                        reminderDTO.getRId(),
+                        reminderDTO.getNic(),
+                        reminderDTO.getLoanType(),
+                        reminderDTO.getRMessage(),
+                        reminderDTO.getRType(),
+                        reminderDTO.getRDate(),
+                        reminderDTO.getRStatus()
                 );
 
                 obList.add(tm);
@@ -135,24 +142,24 @@ public class ReminderFormController {
         }
     }
     @FXML
-    void txtNicOnAction(ActionEvent event) throws SQLException {
+    void txtNicOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         String nic = txtNic.getText();
 
 
-        Reminder reminder = ReminderRepo.searchById(nic);
-        if (reminder != null) {
+        ReminderDTO reminderDTO = reminderBo.searchByNic(nic);
+        if (reminderDTO != null) {
 //              txtReminderId.setText(reminder.getRId());
 //            txtNic.setText(reminder.getNic());
-            txtLoanType.setText(reminder.getLoanType());
+            txtLoanType.setText(reminderDTO.getLoanType());
 //            txtMessage.setText(reminder.getRMessage());
 //            cmbType.setValue(reminder.getRType());
 //            txtDate.setValue(LocalDate.parse(reminder.getRDate()));
 //            cmbStatus.setValue(reminder.getRStatus());
-            txtEmail.setText(reminder.getEmail());
+            txtEmail.setText(reminderDTO.getEmail());
 
         } else {
-            String type = ReminderRepo.getLoanType(nic);
-            String email=ReminderRepo.getEmail(nic);
+            String type = reminderBo.getLoanType(nic);
+            String email=reminderBo.getEmail(nic);
 
             if (type != null) {
                 txtLoanType.setText(type);
@@ -168,22 +175,22 @@ public class ReminderFormController {
             }
         }
     }
-    private void setCustomerData(Reminder reminder) {
-        if (reminder != null) {
-            txtReminderId.setText(reminder.getRId());
-            txtNic.setText(reminder.getNic());
-            cmbType.setValue(reminder.getLoanType());
-            txtMessage.setText(reminder.getRMessage());
-            cmbType.setValue(reminder.getRType());
-            txtDate.setValue(LocalDate.parse(reminder.getRDate()));
-            cmbStatus.setValue(reminder.getRStatus());
+    private void setCustomerData(ReminderDTO reminderDTO) {
+        if (reminderDTO != null) {
+            txtReminderId.setText(reminderDTO.getRId());
+            txtNic.setText(reminderDTO.getNic());
+            cmbType.setValue(reminderDTO.getLoanType());
+            txtMessage.setText(reminderDTO.getRMessage());
+            cmbType.setValue(reminderDTO.getRType());
+            txtDate.setValue(LocalDate.parse(reminderDTO.getRDate()));
+            cmbStatus.setValue(reminderDTO.getRStatus());
 
         } else {
             System.out.println("Reminder data is null.");
         }
     }
     @FXML
-    void btnSaveOnAction(ActionEvent event) {
+    void btnSaveOnAction(ActionEvent event) throws ClassNotFoundException {
         String id = txtReminderId.getText();
         String nic = txtNic.getText();
         String loanType = txtLoanType.getText();
@@ -194,10 +201,10 @@ public class ReminderFormController {
 
 
 
-        Reminder reminder = new Reminder(id,nic,loanType, message, type, date, status);
+        ReminderDTO reminderDTO = new ReminderDTO(id,nic,loanType, message, type, date, status);
 
         try {if (isValied()){
-            boolean isSaved = ReminderRepo.save(reminder);
+            boolean isSaved = reminderBo.saveReminder(reminderDTO);
             if (isSaved) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Reminder saved successfully").show();
                 initialize();
@@ -212,7 +219,7 @@ public class ReminderFormController {
     }
 
     @FXML
-    void btnUpdateOnAction(ActionEvent event) {
+    void btnUpdateOnAction(ActionEvent event) throws ClassNotFoundException {
         String id = txtReminderId.getText();
         String nic = txtNic.getText();
         String loanType = txtLoanType.getText();
@@ -222,10 +229,10 @@ public class ReminderFormController {
         String status = cmbStatus.getValue();
 
 
-        Reminder reminder = new Reminder(id,nic,loanType, message, type, date, status);
+        ReminderDTO reminderDTO = new ReminderDTO(id,nic,loanType, message, type, date, status);
 
         try {if (isValied()){
-            boolean isUpdated = ReminderRepo.update(reminder);
+            boolean isUpdated = reminderBo.updateReminder(reminderDTO);
             if (isUpdated) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Reminder updated successfully").show();
                 initialize();
@@ -239,11 +246,11 @@ public class ReminderFormController {
     }
 
     @FXML
-    void btnDeleteOnAction(ActionEvent event) {
+    void btnDeleteOnAction(ActionEvent event) throws ClassNotFoundException {
         String id = txtReminderId.getText();
 
         try {
-            boolean isDeleted = ReminderRepo.delete(id);
+            boolean isDeleted = reminderBo.deleteReminder(id);
             if (isDeleted) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Reminder deleted successfully").show();
                 initialize();
@@ -294,30 +301,31 @@ public class ReminderFormController {
     public void txtStatusOnAction(ActionEvent event) {
     }
 
-    private void lastReminderId() {
-        try {
-            String lastId = ReminderRepo.getLastReminderId();
-            String nextId = generateNextId(lastId);
-            txtReminderId.setText(nextId);
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: " + e.getMessage());
-        }
+    private String getLastCustomerId(){//limit quiry eken last eka gannawa
+        List<ReminderTm> tempCustomersList = new ArrayList<>(tblReminder.getItems());
+        Collections.sort(tempCustomersList);
+        return tempCustomersList.get(tempCustomersList.size() - 1).getR_id();
     }
 
-    private String generateNextId(String lastId) {
-        String nextId = null;
+    private String generateNewId() {
         try {
-            if (lastId != null && !lastId.isEmpty()) {
-                int lastNumericId = Integer.parseInt(lastId.substring(1));
-                int nextNumericId = lastNumericId + 1;
-                nextId = String.format("R%03d", nextNumericId);
-            } else {
-                nextId = "R001";
-            }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Error generating next ID: Invalid ID format");
+            //Generate New ID
+            return reminderBo.generateNewReminderID();
+        } catch (SQLException e) {
+            new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return nextId;
+
+
+        if (tblReminder.getItems().isEmpty()) {
+            return "R001";
+        } else {
+            String id = getLastCustomerId();
+            int newCustomerId = Integer.parseInt(id.replace("R", "")) + 1;
+            return String.format("R%03d", newCustomerId);
+        }
+
     }
 
     private void showAlert(Alert.AlertType alertType, String message) {
