@@ -1,0 +1,221 @@
+/*CREATE DATABASE IF NOT EXISTS sanasa;
+USE sanasa;
+
+CREATE TABLE IF NOT EXISTS customer (
+    c_id VARCHAR(225) PRIMARY KEY,
+    c_name VARCHAR(255),
+    c_email VARCHAR(255),
+    c_contact VARCHAR(255),
+    c_address VARCHAR(255),
+    c_age INT,
+    date_of_birth DATE,
+    nic VARCHAR(50),
+    registration_date DATE,
+    annual_income DECIMAL(10, 2)
+);
+
+CREATE TABLE IF NOT EXISTS inquiries (
+    in_id VARCHAR(225) PRIMARY KEY,
+    nic VARCHAR(50),
+    c_id VARCHAR(225),
+    in_type VARCHAR(255),
+    in_date DATE,
+    response_date DATE,
+    INDEX idx_in_type (in_type),
+    FOREIGN KEY (c_id) REFERENCES customer(c_id)
+);
+
+CREATE TABLE IF NOT EXISTS loan (
+    loan_id VARCHAR(255) PRIMARY KEY,
+	c_id varchar(255),
+    application VARCHAR(225),
+    loan_amount DECIMAL(10, 2),
+    loan_type VARCHAR(255),
+    loan_term VARCHAR(255),
+    collateral VARCHAR(255),
+    purpose VARCHAR(255),
+percentage DECIMAL(10,2),
+nic varchar(30),
+    INDEX idx_loan_type (loan_type),
+FOREIGN KEY (c_id) REFERENCES customer(c_id)
+
+);
+
+CREATE TABLE IF NOT EXISTS customer_loan_details (
+    loan_id VARCHAR(255),
+    c_id VARCHAR(255),
+    INDEX idx_loan_id (loan_id),
+    INDEX idx_c_id (c_id),
+    FOREIGN KEY (loan_id) REFERENCES loan(loan_id),
+    FOREIGN KEY (c_id) REFERENCES customer(c_id)
+);
+
+CREATE TABLE IF NOT EXISTS employee (
+    e_id VARCHAR(255) PRIMARY KEY,
+    e_name VARCHAR(255),
+    e_contact VARCHAR(255),
+    e_address VARCHAR(255),
+    e_salary DECIMAL(10, 2),
+    position varchar(255)
+);
+
+
+CREATE TABLE IF NOT EXISTS account (
+    a_no VARCHAR(255) PRIMARY KEY,
+    c_id VARCHAR(255),
+    a_type VARCHAR(255),
+    a_balance DECIMAL(10, 2),
+    open_date DATE,
+    status VARCHAR(225),
+    INDEX idx_c_id (c_id),
+    FOREIGN KEY (c_id) REFERENCES customer(c_id)
+);
+
+CREATE TABLE IF NOT EXISTS reminder (
+    r_id VARCHAR(225) PRIMARY KEY,
+    nic VARCHAR(50),
+    loan_type VARCHAR(255),
+    r_message VARCHAR(255),
+    r_type VARCHAR(255),
+    r_date DATE,
+    r_status VARCHAR(50)
+);
+
+CREATE TABLE IF NOT EXISTS balance (
+    b_id VARCHAR(225) PRIMARY KEY,
+    loan_id VARCHAR(225),
+    principal_balance DECIMAL(10, 2),
+    interest_balance DECIMAL(10, 2),
+    total_balance DECIMAL(10, 2),
+    last_updated_date DATE,
+    FOREIGN KEY (loan_id) REFERENCES loan(loan_id),
+    INDEX idx_last_updated_date (last_updated_date)
+);
+
+CREATE TABLE IF NOT EXISTS account_balance_details (
+    b_id VARCHAR(255),
+    a_no VARCHAR(255),
+    a_type VARCHAR(255),
+    a_status VARCHAR(255),
+    INDEX idx_b_id (b_id),
+    INDEX idx_a_no (a_no),
+    FOREIGN KEY (b_id) REFERENCES balance(b_id),
+    FOREIGN KEY (a_no) REFERENCES account(a_no)
+);
+CREATE TABLE IF NOT EXISTS interest_rate (
+    rate_id VARCHAR(255) PRIMARY KEY,
+    loan_type VARCHAR(255),
+    percentage DECIMAL(5, 2)
+);
+
+CREATE TABLE payment (
+    p_invoice_no VARCHAR(255) PRIMARY KEY,
+nic varchar(255),
+    loan_id VARCHAR(255),
+    rate_id VARCHAR(255),
+    p_method VARCHAR(255),
+    p_amount DECIMAL(10, 2),
+    p_date DATE,
+    loan_type VARCHAR(255),
+    late_fee DECIMAL(10, 2),
+    INDEX idx_loan_id (loan_id),
+    INDEX idx_rate_id (rate_id),
+    FOREIGN KEY (loan_id) REFERENCES loan(loan_id),
+    FOREIGN KEY (rate_id) REFERENCES interest_rate(rate_id)
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    userId VARCHAR(225) PRIMARY KEY,
+    name VARCHAR(225),
+    NIC VARCHAR(12),
+    password VARCHAR(8)
+);
+
+ALTER TABLE payment
+ADD CONSTRAINT loan_id
+FOREIGN KEY (loan_id)
+REFERENCES loan(loan_id)
+ON DELETE CASCADE;
+
+ALTER TABLE payment
+ADD CONSTRAINT rate_id
+FOREIGN KEY (rate_id)
+REFERENCES interest_rate(rate_id)
+ON DELETE CASCADE;
+
+ALTER TABLE loan
+ADD COLUMN `date` DATE;
+
+INSERT INTO users (userId, name, NIC, password) VALUES ('1', 'vagi', '200363748423', '1');
+
+
+
+-- Values for the `customer` table
+INSERT INTO customer (c_id, c_name, c_email, c_contact, c_address, c_age, date_of_birth, nic, registration_date, annual_income)
+VALUES
+('C001', 'John Doe', 'johndoe@example.com', '0756576897', '123 Main St, City', 30, '1994-05-10', '200362310434', '2022/01/01', 50000.00),
+('C002', 'Jane Smith', 'janesmith@example.com', '0725467945', '456 Elm St, Town', 25, '1999-12-15', '200362310435', '2022/02/15', 60000.00);
+
+-- Values for the `inquiries` table
+INSERT INTO inquiries (in_id, nic, c_id, in_type, in_date, response_date)
+VALUES
+('INQ001', '200362310434', 'C001', 'General', '2022-03-05', '2022-03-10'),
+('INQ002', '200362310435', 'C002', 'Loan', '2022-04-15', '2022-04-20');
+
+-- Values for the `loan` table
+INSERT INTO loan (loan_id, c_id, application, loan_amount, loan_type, loan_term, collateral, purpose, percentage, nic)
+VALUES
+('L001', 'C001', 'Home Loan', 150000.00, 'Mortgage', '15 years', 'House', 'Purchase', 6.5, '123456789V'),
+('L002', 'C002', 'Car Loan', 25000.00, 'Auto Loan', '5 years', 'Car', 'Vehicle Purchase', 8.0, '987654321W');
+
+-- Values for the `customer_loan_details` table
+INSERT INTO customer_loan_details (loan_id, c_id)
+VALUES
+('L001', 'C001'),
+('L002', 'C002');
+
+-- Values for the `employee` table
+INSERT INTO employee (e_id, e_name, e_contact, e_address, e_salary, loan_id)
+VALUES
+('E001', 'Michael Johnson', '9876543211', '789 Oak St, Village', 50000.00, 'L001'),
+('E002', 'Sarah Williams', '1234567891', '321 Pine St, Town', 60000.00, 'L002');
+
+-- Values for the `account` table
+INSERT INTO account (a_no, c_id, a_type, a_balance, open_date, status)
+VALUES
+('ACC001', 'C001', 'Savings', 10000.00, '2022-01-01', 'Active'),
+('ACC002', 'C002', 'Checking', 5000.00, '2022-02-15', 'Active');
+
+-- Values for the `reminder` table
+INSERT INTO reminder (r_id, nic, loan_type, r_message, r_type, r_date, r_status)
+VALUES
+('REM001', '123456789V', 'Mortgage', 'Payment due on 15th', 'Payment Reminder', '2022-05-10', 'Pending'),
+('REM002', '987654321W', 'Auto Loan', 'Payment overdue', 'Payment Reminder', '2022-04-30', 'Overdue');
+
+-- Values for the `balance` table
+INSERT INTO balance (b_id, loan_id, principal_balance, interest_balance, total_balance, last_updated_date)
+VALUES
+('BAL001', 'L001', 140000.00, 10000.00, 150000.00, '2022-04-01'),
+('BAL002', 'L002', 24000.00, 1000.00, 25000.00, '2022-04-01');
+
+-- Values for the `account_balance_details` table
+INSERT INTO account_balance_details (b_id, a_no, a_type, a_status)
+VALUES
+('BAL001', 'ACC001', 'Savings', 'Active'),
+('BAL002', 'ACC002', 'Checking', 'Active');
+
+-- Values for the `interest_rate` table
+INSERT INTO interest_rate (rate_id, loan_type, percentage)
+VALUES
+('RATE001', 'Mortgage', 6.5),
+('RATE002', 'Auto Loan', 8.0);
+
+-- Values for the `payment` table
+INSERT INTO payment (p_invoice_no, nic, loan_id, rate_id, p_method, p_amount, p_date, loan_type, late_fee)
+VALUES
+('INV001', '123456789V', 'L001', 'RATE001', 'Bank Transfer', 5000.00, '2022-04-15', 'Mortgage', 100.00),
+('INV002', '987654321W', 'L002', 'RATE002', 'Credit Card', 2000.00, '2022-05-02', 'Auto Loan', 50.00);
+
+-- Values for the `users` table
+INSERT INTO users (userId, name, NIC, password) VALUES ('1', 'vagi', '200363748423', '1');
+*/
