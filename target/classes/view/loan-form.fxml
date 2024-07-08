@@ -70,20 +70,20 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></JFXButton>
-      <JFXButton buttonType="RAISED" layoutX="1050.0" layoutY="531.0" onAction="#btnUpdateOnAction" prefHeight="33.0" prefWidth="75.0" style="-fx-background-color: #30336b; -fx-text-fill: white; -fx-border-color: #30336b;" text="Update" textFill="WHITE">
-         <font>
-            <Font name="Cambria Bold Italic" size="15.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor></JFXButton>
-      <JFXButton buttonType="RAISED" layoutX="1050.0" layoutY="581.0" onAction="#btnDeleteOnAction" prefHeight="33.0" prefWidth="75.0" style="-fx-background-color: #f53b57; -fx-text-fill: white; -fx-border-color: #f53b57;" text="Delete">
-         <font>
-            <Font name="Cambria Bold Italic" size="15.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor></JFXButton>
+<!--      <JFXButton buttonType="RAISED" layoutX="1050.0" layoutY="531.0" onAction="#btnUpdateOnAction" prefHeight="33.0" prefWidth="75.0" style="-fx-background-color: #30336b; -fx-text-fill: white; -fx-border-color: #30336b;" text="Update" textFill="WHITE">-->
+<!--         <font>-->
+<!--            <Font name="Cambria Bold Italic" size="15.0" />-->
+<!--         </font>-->
+<!--         <cursor>-->
+<!--            <Cursor fx:constant="HAND" />-->
+<!--         </cursor></JFXButton>-->
+<!--      <JFXButton buttonType="RAISED" layoutX="1050.0" layoutY="581.0" onAction="#btnDeleteOnAction" prefHeight="33.0" prefWidth="75.0" style="-fx-background-color: #f53b57; -fx-text-fill: white; -fx-border-color: #f53b57;" text="Delete">-->
+<!--         <font>-->
+<!--            <Font name="Cambria Bold Italic" size="15.0" />-->
+<!--         </font>-->
+<!--         <cursor>-->
+<!--            <Cursor fx:constant="HAND" />-->
+<!--         </cursor></JFXButton>-->
 
       <JFXComboBox fx:id="cmbApplicationType" layoutX="767.0" layoutY="184.0" onAction="#txtApplicationOnAction" prefHeight="26.0" prefWidth="150.0" />
       <Label layoutX="221.0" layoutY="263.0" prefHeight="30.0" prefWidth="85.0" text="Loan Term">

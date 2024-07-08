@@ -232,6 +232,9 @@ public class LoanFormController {
                 new Alert(Alert.AlertType.CONFIRMATION, "Loan updated successfully").show();
                 initialize();
                 clearFields();
+            } else {
+                new Alert(Alert.AlertType.WARNING, "Loan update failed").show();
+
             }
         } catch(SQLException | ClassNotFoundException e){
                 new Alert(Alert.AlertType.ERROR, "Error updating loan: " + e.getMessage()).show();

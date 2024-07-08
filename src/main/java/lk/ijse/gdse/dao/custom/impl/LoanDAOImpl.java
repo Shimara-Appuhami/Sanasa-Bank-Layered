@@ -4,7 +4,6 @@ import lk.ijse.gdse.dao.SQLUtil;
 import lk.ijse.gdse.dao.custom.LoanDAO;
 import lk.ijse.gdse.entity.InterestRate;
 import lk.ijse.gdse.entity.Loan;
-import lk.ijse.gdse.model.tm.InterestRateTm;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
