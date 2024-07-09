@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PaymentDetailsReport" language="sql" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1b43b178-be12-4348-976b-10bdb772a76e">
 	<queryString>
-		<![CDATA[SELECT sanasa.payment.p_invoice_no, sanasa.payment.loan_id, sanasa.payment.loan_type, sanasa.payment.p_amount, sanasa.payment.p_method, sanasa.payment.late_fee, sanasa.payment.p_date FROM sanasa.payment WHERE sanasa.payment.nic = $P{nic}]]>
+		<![CDATA[SELECT sanasa.paymentDTO.p_invoice_no, sanasa.paymentDTO.loan_id, sanasa.paymentDTO.loan_type, sanasa.paymentDTO.p_amount, sanasa.paymentDTO.p_method, sanasa.paymentDTO.late_fee, sanasa.paymentDTO.p_date FROM sanasa.paymentDTO WHERE sanasa.paymentDTO.nic = $P{nic}]]>
 	</queryString>
 	<field name="p_invoice_no" class="java.lang.String"/>
 	<field name="loan_id" class="java.lang.String"/>
