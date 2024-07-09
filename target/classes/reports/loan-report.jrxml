@@ -4,7 +4,7 @@
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter (13)"/>
 	<queryString language="SQL">
-		<![CDATA[select * from  sanasa.loanDTO]]>
+		<![CDATA[select * from  sanasa.loan]]>
 	</queryString>
 	<field name="loan_id" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="loan_id"/>
