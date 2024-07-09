@@ -3,7 +3,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Login {
+public class LoginDTO {
     private String userId;
     private String name;
     private String nic;

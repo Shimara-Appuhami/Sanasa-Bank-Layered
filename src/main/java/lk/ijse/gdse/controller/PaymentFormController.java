@@ -22,7 +22,6 @@ import lk.ijse.gdse.entity.Payment;
 import lk.ijse.gdse.model.PaymentDTO;
 import lk.ijse.gdse.model.tm.LoanTm;
 import lk.ijse.gdse.model.tm.PaymentTm;
-import lk.ijse.gdse.repository.*;
 
 import java.io.IOException;
 import java.sql.SQLException;

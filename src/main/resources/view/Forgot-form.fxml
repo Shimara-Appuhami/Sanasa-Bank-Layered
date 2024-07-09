@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane  prefHeight="197.0" prefWidth="414.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.gdse.controller.ForgotFormController">
+<AnchorPane fx:id="node" prefHeight="197.0" prefWidth="414.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.gdse.controller.ForgotFormController">
    <children>
       <ImageView fitHeight="319.0" fitWidth="499.0">
          <image>
@@ -20,12 +18,18 @@
             <Font name="Cambria Bold" size="15.0" />
          </font>
       </Label>
-      <JFXButton fx:id="btnLogin" layoutX="413.0" layoutY="61.0" onAction="#btnLoginOnAction" prefHeight="26.0" prefWidth="74.0" style="-fx-background-color: #1877F2;" text="OK" textFill="WHITE">
+
+      <TextField fx:id="txtNic" layoutX="168.0" layoutY="62.0" onAction="#txtNicOnAction" />
+      <TextField fx:id="txtNewPassword" layoutX="175.0" layoutY="233.0" onAction="#txtNewPasswordOnAction" />
+      <JFXButton fx:id="btnChange" buttonType="RAISED" layoutX="217.0" layoutY="270.0" onAction="#btnChangeOnAction" prefHeight="34.0" prefWidth="74.0" style="-fx-background-color: #1e8ad7;" text="Change" textFill="WHITE">
          <font>
-            <Font name="Cambria Bold" size="14.0" />
+            <Font name="Cambria Bold" size="15.0" />
          </font>
       </JFXButton>
-      <TextField fx:id="txtNic" layoutX="168.0" layoutY="62.0" onAction="#txtNicOnAction" />
-      <AnchorPane fx:id="node" layoutX="3.0" layoutY="160.0" prefHeight="152.0" prefWidth="499.0" />
+      <Label layoutX="158.0" layoutY="188.0" text="Enter Your New Password" textFill="#151111">
+         <font>
+            <Font name="Britannic Bold" size="15.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

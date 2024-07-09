@@ -11,7 +11,7 @@ public class BOFactory {
         return boFactory==null? new BOFactory():boFactory;
     }
     public enum BoTypes{
-        CUSTOMER,ACCOUNT,BALANCE,CUSTOMERLOAN,EMPLOYEE,INQUIRY,INTERESTRATE,LOAN,PAYMENT,REMINDER
+        CUSTOMER,ACCOUNT,BALANCE,CUSTOMERLOAN,EMPLOYEE,INQUIRY,INTERESTRATE,LOAN,PAYMENT,REMINDER,USER,
 
     }
     public SuperBO getBo(BoTypes boTypes){
@@ -36,6 +36,9 @@ public class BOFactory {
                 return new PaymentBoImpl();
             case REMINDER :
                 return new ReminderBoImpl();
+            case USER:
+                return new UserBoImpl();
+
 
 
             default:

@@ -14,7 +14,7 @@ public class DAOFactory {
         return daoFactory==null? new DAOFactory():daoFactory;
     }
     public enum DAOTypes{
-        CUSTOMER,ACCOUNT,BALANCE,CUSTOMERLOAN,EMPLOYEE,INQUIRY,INTERESTRATE,LOAN,PAYMENT,REMINDER
+        CUSTOMER,ACCOUNT,BALANCE,CUSTOMERLOAN,EMPLOYEE,INQUIRY,INTERESTRATE,LOAN,PAYMENT,REMINDER,USER,LOGIN
     }
     public SuperDAO getDAO(DAOTypes daoTypes ){
         switch (daoTypes){
@@ -38,6 +38,11 @@ public class DAOFactory {
                 return new PaymentDAOImpl();
             case REMINDER :
                 return new ReminderDAOImpl();
+                case USER :
+                    return new UserDAOImpl();
+                case LOGIN :
+                    return new LoginDAOImpl();
+
 
 
             default:

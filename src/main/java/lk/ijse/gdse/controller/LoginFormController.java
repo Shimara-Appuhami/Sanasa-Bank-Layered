@@ -13,9 +13,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import lk.ijse.gdse.dao.custom.LoginDAO;
+import lk.ijse.gdse.dao.custom.impl.LoginDAOImpl;
 import lk.ijse.gdse.db.DbConnection;
 
-import lk.ijse.gdse.repository.LoginRepo;
+
 
 import java.io.IOException;
 import java.net.URL;
@@ -42,7 +44,7 @@ public class LoginFormController {
 
 
     @FXML
-    private void initialize() {
+    private void initialize() throws ClassNotFoundException, SQLException {
         suggestLastUsername();
     }
     @FXML
@@ -122,9 +124,10 @@ private void navigateToTheDashboard() throws IOException {
         stage.setTitle("Forgot Form");
 
     }
-    private void suggestLastUsername() {
+    public void suggestLastUsername() throws SQLException, ClassNotFoundException {
+        LoginDAO loginDAO = new LoginDAOImpl();
         try {
-            String lastUsername = LoginRepo.getLastEnteredUsername();
+            String lastUsername = loginDAO.getLastEnteredUsername();
             if (lastUsername != null && !lastUsername.isEmpty()) {
                 txtUsername.setText(lastUsername);
             }

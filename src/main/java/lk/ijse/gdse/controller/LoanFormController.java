@@ -16,7 +16,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lk.ijse.gdse.Util.Regex;
 import lk.ijse.gdse.bo.BOFactory;
+import lk.ijse.gdse.bo.custom.CustomerLoanBo;
 import lk.ijse.gdse.bo.custom.LoanBo;
+import lk.ijse.gdse.bo.custom.impl.CustomerLoanBoImpl;
 import lk.ijse.gdse.db.DbConnection;
 import lk.ijse.gdse.entity.InterestRate;
 import lk.ijse.gdse.entity.Loan;
@@ -27,7 +29,7 @@ import lk.ijse.gdse.model.tm.CustomerTm;
 import lk.ijse.gdse.model.tm.InterestRateTm;
 import lk.ijse.gdse.model.tm.LoanTm;
 
-import lk.ijse.gdse.repository.CustomerLoanRepo;
+
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
@@ -82,7 +84,9 @@ public class LoanFormController {
     @FXML
     private JFXComboBox<String> cmbApplicationType;
 
+    CustomerLoanBo customerLoanBo= (CustomerLoanBo) BOFactory.getBoFactory().getBo(BOFactory.BoTypes.CUSTOMERLOAN);
     LoanBo loanBo= (LoanBo) BOFactory.getBoFactory().getBo(BOFactory.BoTypes.LOAN);
+
 
     private final ObservableList<CustomerLoanTm> obList = FXCollections.observableArrayList();
 
@@ -188,8 +192,8 @@ public class LoanFormController {
                     List<CustomerLoanDTO> customerLoanDTOList = new ArrayList<>();
                     customerLoanDTOList.add(customerLoanDTO);
 
-                    CustomerLoanRepo customerLoanRepo = new CustomerLoanRepo();
-                    boolean isSaved = customerLoanRepo.saveCustomerLoan(customerLoanDTOList);
+                    CustomerLoanBo customerLoanBo = new CustomerLoanBoImpl();
+                    boolean isSaved = customerLoanBo.saveCustomerLoan(customerLoanDTOList);
 
                     if (isSaved) {
                         new Alert(Alert.AlertType.INFORMATION, "Customer loan details Transaction saved successfully.").show();
