@@ -34,7 +34,7 @@ public class ForgotFormController {
 
      UserBo userBo = (UserBo) BOFactory.getBoFactory().getBo(BOFactory.BoTypes.USER);
 
-    private void checkCredential(String nic) throws SQLException, IOException, ClassNotFoundException {
+    private void updatePassword(String nic) throws SQLException, IOException, ClassNotFoundException {
         boolean isNicExist = userBo.checkCredential(nic);
         if (isNicExist) {
             String newPassword = txtNewPassword.getText();
@@ -52,7 +52,7 @@ public class ForgotFormController {
 
     @FXML
     void btnChangeOnAction(ActionEvent event) throws SQLException, IOException, ClassNotFoundException {
-        checkCredential(txtNic.getText());
+        updatePassword(txtNic.getText());
     }
 
     private void navigateToLoginPage() throws IOException {
