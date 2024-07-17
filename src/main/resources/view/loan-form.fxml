@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXComboBox?>
-<?import javafx.scene.Cursor?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Line?>
-<?import javafx.scene.text.Font?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="790.0" prefWidth="1300.0" style="-fx-background-color: #BBE2EC;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.gdse.controller.LoanFormController">
+<AnchorPane prefHeight="790.0" prefWidth="1300.0" style="-fx-background-color: #BBE2EC;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.gdse.controller.LoanFormController">
    <children>
       <ImageView fitHeight="790.0" fitWidth="1300.0" layoutX="-9.0">
          <image>
@@ -98,9 +92,9 @@
       </Label>
       <TextField fx:id="txtLoanTerm" layoutX="359.0" layoutY="266.0" onAction="#txtLoanTermOnAction" onKeyReleased="#txtTermOnKeyReleased" promptText="Y" />
       <TextField fx:id="txtollateral" layoutX="359.0" layoutY="319.0" onAction="#txtollateralOnAction" onKeyReleased="#txtColatrellalOnKeyReleased" promptText="collateral" />
-      <Label layoutX="221.0" layoutY="373.0" prefHeight="30.0" prefWidth="97.0" text="Purpose">
+      <Label layoutX="221.0" layoutY="370.0" prefHeight="30.0" prefWidth="97.0" text="Purpose">
          <font>
-            <Font name="Cambria Bold" size="14.0" />
+            <Font name="Cambria" size="14.0" />
          </font>
       </Label>
       <TextField fx:id="txtpurpose" layoutX="358.0" layoutY="376.0" onAction="#txtpurposeOnAction" promptText="purpose" />
