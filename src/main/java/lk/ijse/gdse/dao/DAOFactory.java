@@ -6,6 +6,7 @@ import lk.ijse.gdse.entity.Account;
 
 public class DAOFactory {
     private static DAOFactory daoFactory;
+
     private DAOFactory(){
 
     }

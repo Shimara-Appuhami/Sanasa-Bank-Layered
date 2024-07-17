@@ -88,9 +88,10 @@ public class WelcomeController implements Initializable {
 
 
 
+
     private void navigateToLoginPage() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/login-form.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/selection-form.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) progressBar.getScene().getWindow(); // Get the stage from the progress bar scene
             stage.setScene(new Scene(root));
